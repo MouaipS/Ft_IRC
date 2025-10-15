@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include "User.hpp"
 
 Channel::Channel(std::string name, std::string key, std::string topic) : _name(name), _key(key), _topic(topic), _isLimit(false), _isKey(true) {}
 
@@ -47,4 +48,15 @@ void Channel::setKey(std::string key) {
 		_key = key;
 		std::cout << "New key set." << std::endl;
 	} 
+}
+
+void	Channel::addUser(User &user) {
+
+	if (_usersname.size() == LIMIT_USER)
+		throw UserLimitChannel();
+	_usersname.push_back(user.getUsername());
+}
+
+const char*	Channel::UserLimitChannel::what() const throw() {
+	return ("The channel is full");
 }

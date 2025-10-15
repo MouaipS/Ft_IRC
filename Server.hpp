@@ -6,7 +6,6 @@
 #include <stdexcept>
 
 #define CHANNEL_LIMIT	1000
-#define	USER_LIMIT		9999
 
 class Server
 {
@@ -21,11 +20,14 @@ class Server
 
 		// FUNCTIONS
 		void	userJoinServer(std::string userName);
+		void	userJoinChannel(User &user, std::string chName);
 
 		// EXCEPTIONS
 		class ServerLimitUser: public std::exception {
 			public: const char* what() const throw(); };
 		class UserNameAlreadyUsed: public std::exception {
+			public: const char* what() const throw(); };
+		class ServerLimitChannel: public std::exception {
 			public: const char* what() const throw(); };
 
 	private:

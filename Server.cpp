@@ -50,6 +50,23 @@ void	Server::userJoinServer(std::string userName) {
 	_allUsers.push_back(User(userName, userName, _allChannels.back()));
 }
 
+void	Server::userJoinChannel(User &user, std::string chName) {
+
+	int	size = _allChannels.size();
+
+	for (int i = 0; i < size; i++) {
+
+		if (chName == _allChannels[i].getName()) {
+			
+			_allChannels[i].addUser(user);
+			return ;
+		}
+	}
+	if (_allChannels.size() == CHANNEL_LIMIT)
+		throw ServerLimitChannel();
+	_allChannels.push_back(Channel(chName, 0, 0));
+}
+
 
 
 // -- E X C E P T I O N S -- \\
@@ -59,3 +76,6 @@ const char*	Server::ServerLimitUser::what() const throw() {
 
 const char*	Server::UserNameAlreadyUsed::what() const throw() {
 	return ("User name already used"); }
+
+const char* Server::ServerLimitChannel::what() const throw() {
+	return ("Can't create more channels"); }
