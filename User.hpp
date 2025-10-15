@@ -7,6 +7,7 @@
 class User {
 	public :
 		User(std::string username, std::string nickname, Channel home);
+		~User();
 
 		//Geter
 		std::string getUsername() const;
