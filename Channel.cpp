@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(std::string name, std::string key, std::string topic) : _name(name), _key(key), _topic(topic), _isLimit(false), _isKey(true) {}
+Channel::Channel(std::string name, std::string key, std::string topic) : _name(name), _isLimit(false), _key(key), _isKey(true), _topic(topic) {}
 
 std::string Channel::getName() const {
 	return(_name);

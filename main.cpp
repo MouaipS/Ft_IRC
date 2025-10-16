@@ -2,11 +2,14 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 #include "User.hpp"
+// #include "Message.hpp"
+#include <sstream>
 
 int main (int argc, char **argv) {
 
-	if (argc != 3)
-		return (1);
-
-	Server	IRCserver = Server();
+	if (argc == 2)
+	{
+		Server	ircSERV = Server();
+		ircSERV.initServer(argv[1]);
+	}
 }
