@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <netdb.h>
 #include <bits/stdc++.h>
+#include <fcntl.h>
+
 
 #define CHANNEL_LIMIT	1000
 
@@ -40,11 +42,12 @@ class Server
 		std::string				_password;
 		std::vector<Channel>	_allChannels;
 		std::vector<User>		_allUsers;
+		std::vector<int>		_client_fd;
 
 		addrinfo			hints;
 		addrinfo			*res;
-		sockaddr_storage	their_addr;
+		//sockaddr_storage	their_addr;
 		int					sockfd;
-		int					acceptfd;
+		//int					acceptfd;
 
 };

@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "sys/epoll.h"
 
 Server::Server(): _name("SilkRoad"), _password("motdepasse") {
 
@@ -108,13 +109,48 @@ void	Server::initServer(std::string portNumber) {
 		return ;
 	}
 
-	socklen_t	addr_size = sizeof(their_addr);
-	acceptfd = accept(sockfd, (sockaddr *)&their_addr, &addr_size);
-	if (acceptfd == -1) {
-		std::cout << "Error: accept() failed" << std::endl;
-		freeaddrinfo(res);
-		return ;
+	int epoll_fd = epoll_create(1);
+	epoll_event dataEpoll, events[180];
+	dataEpoll.events = EPOLLIN;
+	dataEpoll.data.fd = sockfd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &dataEpoll);
+
+
+	while(1) {
+		int nb_event = epoll_wait(epoll_fd, events, 180, 1000);
+		if(nb_event != -1){
+			for(int i = 0; i < nb_event; i++) {
+				int fd_actif = events[i].data.fd;
+
+				if(fd_actif == sockfd) {
+					int client_fd = accept(fd_actif, NULL, NULL);
+					if(client_fd == -1){
+						std::cout << "Error: accept() failed" << std::endl;
+					} else {
+						int flags = fcntl(client_fd, F_GETFL, 0);
+						fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+						dataEpoll.data.fd = client_fd;
+						epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
+						_client_fd.push_back(client_fd);
+						//std::cout << "salut" << std::endl; LE CLIENT RECOIT DES MESSAGES DE BIENVENUE PERSO
+					}
+				} else {
+					std::cout << "non" << std::endl;
+				}
+			}
+		}
 	}
+
+
+
+
+	//socklen_t	addr_size = sizeof(their_addr);
+	//acceptfd = accept(sockfd, (sockaddr *)&their_addr, &addr_size);
+	//if (acceptfd == -1) {
+	//	std::cout << "Error: accept() failed" << std::endl;
+	//	freeaddrinfo(res);
+	//	return ;
+	//}
 }
 
 
