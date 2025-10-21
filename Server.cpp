@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "sys/epoll.h"
 
 Server::Server(): _name("SilkRoad"), _password("motdepasse") {
 
@@ -22,23 +21,6 @@ Server::Server(const Server &obj) {
 }
 
 Server::~Server() {}
-
-
-
-// O P E R A T O R S
-
-// Server &Server::operator=(const Server &obj) {
-
-	// if (this != &obj) {
-		// _name = obj._name;
-		// _password = obj._password;
-		// _allChannels = obj._allChannels;
-		// _allUsers = obj._allUsers;
-	// }
-	// return (*this);
-// }
-
-
 
 // F U N C T I O N S
 
@@ -71,6 +53,23 @@ void	Server::userJoinChannel(User &user, std::string chName) {
 	_allChannels.push_back(Channel(chName, 0, 0));
 }
 
+
+void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
+	int client_fd = accept(fd_actif, NULL, NULL);
+	if(client_fd == -1){
+		std::cout << "Error: accept() failed" << std::endl;
+	} else {
+		int flags = fcntl(client_fd, F_GETFL, 0);
+		fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+		dataEpoll.data.fd = client_fd;
+		epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
+		_client_fd.push_back(client_fd);
+		std::cout << "salut" << std::endl; 
+		//LE CLIENT RECOIT DES MESSAGES DE BIENVENUE PERSO
+	}
+}
+
+
 void	Server::initServer(std::string portNumber) {
 
 	memset(&hints, 0, sizeof(hints));
@@ -97,12 +96,6 @@ void	Server::initServer(std::string portNumber) {
 		return ;
 	}
 
-	// if (connect(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-		// std::cout << "Error: connect() failed" << std::endl;
-		// freeaddrinfo(res);
-		// return ;
-	// }
-
 	if (listen(sockfd, 10) == -1) {
 		std::cout << "Error: listen() failed" << std::endl;
 		freeaddrinfo(res);
@@ -115,42 +108,20 @@ void	Server::initServer(std::string portNumber) {
 	dataEpoll.data.fd = sockfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &dataEpoll);
 
-
 	while(1) {
-		int nb_event = epoll_wait(epoll_fd, events, 180, 1000);
+		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
 		if(nb_event != -1){
 			for(int i = 0; i < nb_event; i++) {
 				int fd_actif = events[i].data.fd;
 
 				if(fd_actif == sockfd) {
-					int client_fd = accept(fd_actif, NULL, NULL);
-					if(client_fd == -1){
-						std::cout << "Error: accept() failed" << std::endl;
-					} else {
-						int flags = fcntl(client_fd, F_GETFL, 0);
-						fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-						dataEpoll.data.fd = client_fd;
-						epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
-						_client_fd.push_back(client_fd);
-						//std::cout << "salut" << std::endl; LE CLIENT RECOIT DES MESSAGES DE BIENVENUE PERSO
-					}
+					NewClient(fd_actif, dataEpoll, epoll_fd);
 				} else {
-					std::cout << "non" << std::endl;
+					//GESTION MESSAGE
 				}
 			}
 		}
 	}
-
-
-
-
-	//socklen_t	addr_size = sizeof(their_addr);
-	//acceptfd = accept(sockfd, (sockaddr *)&their_addr, &addr_size);
-	//if (acceptfd == -1) {
-	//	std::cout << "Error: accept() failed" << std::endl;
-	//	freeaddrinfo(res);
-	//	return ;
-	//}
 }
 
 

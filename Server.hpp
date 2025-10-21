@@ -9,6 +9,8 @@
 #include <netdb.h>
 #include <bits/stdc++.h>
 #include <fcntl.h>
+#include "sys/epoll.h"
+
 
 
 #define CHANNEL_LIMIT	1000
@@ -28,6 +30,7 @@ class Server
 		void	userJoinServer(std::string userName);
 		void	userJoinChannel(User &user, std::string chName);
 		void	initServer(std::string portNumber);
+		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
 
 		// EXCEPTIONS
 		class ServerLimitUser: public std::exception {
