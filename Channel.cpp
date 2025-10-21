@@ -60,3 +60,8 @@ void	Channel::addUser(User &user) {
 const char*	Channel::UserLimitChannel::what() const throw() {
 	return ("The channel is full");
 }
+
+
+std::vector<std::string> &Channel::getUsersname() {
+	return(_usersname);
+}

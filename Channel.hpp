@@ -10,12 +10,14 @@ class Channel {
 	public :
 		Channel(std::string name, std::string key, std::string topic);
 
-		std::string getName() const;
 		std::string getKey() const;
+		std::string getName() const;
+		std::vector<std::string> &getUsersname();
 		void 	changeLimit(int limit);
 		void 	setLimit();
 		void 	setKey(std::string key);
 		void	addUser(User &user);
+		
 
 		class UserLimitChannel: public std::exception {
 			public: const char* what() const throw(); };

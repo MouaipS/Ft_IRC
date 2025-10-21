@@ -7,5 +7,5 @@ class ACommand {
 		ACommand();
 		std::string _name;
 	private :
-		void execCmd (User &user, Channel &channel);
+		virtual void execCmd (User &user, Channel &channel);
 };

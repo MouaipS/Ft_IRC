@@ -1,0 +1,9 @@
+#pragma once 
+#include "ACommand.hpp"
+
+class Kick : public ACommand {
+	public :
+		Kick();
+	private :
+		void execCmd (User &user, Channel &channel);
+};

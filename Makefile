@@ -6,6 +6,7 @@ SOURCES = main.cpp \
 		  Channel.cpp \
 		  Message.cpp \
 		  ACommand.cpp \
+		  KICK.cpp
 
 OBJ = $(SOURCES:.cpp=.o)
 OBJDIR = objects
