@@ -10,6 +10,7 @@ class Channel {
 		~Channel();
 
 		// GET
+		
 		std::string			getName() const;
 		std::vector<User*>	getUsers() const;
 		std::vector<User*>	getOperators() const;
@@ -22,6 +23,7 @@ class Channel {
 		size_t				getUserLimit() const;
 		
 		// SET
+
 		void	setIsInviteOnly(bool value);
 		void	setTopic(const std::string& value);
 		void	setIsTopicProtected(bool value);
@@ -31,6 +33,7 @@ class Channel {
 		void	setUserLimit(size_t value);
 
 		// Utils
+
 		size_t	findUser(User& user);
 		size_t	findOperator(User& user);
 		bool	addUserToChannel(User& user);
