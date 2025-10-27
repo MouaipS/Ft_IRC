@@ -1,59 +1,193 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(std::string name) : _name(name) {}
-
-std::string Channel::getName() const {
-	return(_name);
+Channel::Channel(std::string name) : _name(name)
+{
+	_isInviteOnly = true;
+	_isTopicProtected = true;
+	_isKeyProtected = false;
+	_isUserLimit = true;
+	_userLimit = 100;
 }
 
-void Channel::changeLimit(int limit) {
-	if(_isLimit == true) {
-		if(limit > 0 && limit < 100) {
-			_limit = limit;
-		}
-		else 
-			std::cout << "A Channel can't accept more than hundred user." << std::endl;
+Channel::~Channel()
+{
+	std::cout << "Channel " << _name << "has been destroyed." << std::endl;
+}
+
+// ------------- GET  ------------- //
+std::string Channel::getName() const
+{
+    return _name;
+}
+
+std::vector<User*> Channel::getUsers() const
+{
+    return _users;
+}
+
+std::vector<User*> Channel::getOperators() const
+{
+    return _operators;
+}
+
+std::string Channel::getTopic() const
+{
+    return _topic;
+}
+
+std::string Channel::getKey() const
+{
+    return _key;
+}
+
+bool Channel::getIsInviteOnly() const
+{
+    return _isInviteOnly;
+}
+
+bool Channel::getIsTopicProtected() const
+{
+    return _isTopicProtected;
+}
+
+bool Channel::getIsKeyProtected() const
+{
+    return _isKeyProtected;
+}
+
+bool Channel::getIsLimit() const
+{
+    return _isUserLimit;
+}
+
+int Channel::getUserLimit() const
+{
+    return _userLimit;
+}
+
+
+// ------------- SET  ------------- //
+
+void Channel::setIsInviteOnly(bool value)
+{
+    _isInviteOnly = value;
+}
+
+void Channel::setTopic(const std::string& value)
+{
+    _topic = value;
+}
+
+void Channel::setIsTopicProtected(bool value)
+{
+    _isTopicProtected = value;
+}
+
+void Channel::setKey(const std::string& value)
+{
+    _key = value;
+}
+
+void Channel::setIsKeyProtected(bool value)
+{
+    _isKeyProtected = value;
+}
+
+void Channel::setUserLimit(int value)
+{
+    _userLimit = value;
+}
+
+void Channel::setIsLimit(bool value)
+{
+    _isUserLimit = value;
+}
+
+
+// ------------- UTILS  ------------- //
+
+size_t	Channel::findUser(User& user)
+{
+	for (size_t i = 0; i < _users.size(); ++i)
+	{
+		if (&user == _users[i])
+			return (i);
 	}
-	else
-		std::cout << "You can't change the limit. Please enable it before making changes." << std::endl;
+
+	return (-1);
 }
 
-void Channel::setLimit() {
-	_isLimit = !_isLimit;
-	if(_isLimit == true) 
-		std::cout << "Limit changed : enabled." << std::endl;
-	else 
-		std::cout << "Limit change : disabled." << std::endl;
+size_t	Channel::findOperator(user& user)
+{
+	for (size_t i = 0; i < _operators.size(); ++i)
+	{
+		if (&user == _operators[i])
+			return (i);
+	}
 
+	return (-1);
 }
 
-void	Channel::addUser(User &user) {
+bool Channel::addUserToChannel(User& user)
+{
+	if (_isUserLimit && _users.size() >= _userLimit)
+		return (false);
 
-	if (_usersname.size() == LIMIT_USER)
-		throw UserLimitChannel();
-	_usersname.push_back(user.getUsername());
+	if (findUser(user) >= 0)
+		return (false);
+
+	_users.push_back(&user);
+
+	return (true);
 }
 
-const char*	Channel::UserLimitChannel::what() const throw() {
-	return ("The channel is full");
+bool Channel::removeUserFromChannel(User& user)
+{
+	size_t	user_index;
+	size_t	operator_index;
+
+	user_index = findUser(user);
+	operator_index = findOperator(user);
+
+	if (operator_index >= 0)
+		_operators.erase(operator_index);
+
+	if (user_index >= 0)
+	{
+		_users.erase(user_index);
+		return (true);
+	}
+
+	return (false);
 }
 
+bool Channel::promoteUser(User &user)
+{
+	if (!isUserInChannel(user))
+		return (false);
 
-std::vector<std::string> &Channel::getUsersname() {
-	return(_usersname);
+	if (isUserInOperators(user))
+		return (false);
+
+	_operators.push_back(&user);
+
+	return (true);
 }
 
-std::vector<std::string> &Channel::getOperator() {
-	return(_operator);
-}
+bool Channel::demoteUser(User &user)
+{
+	size_t	operator_index;
 
-bool Channel::changeInvite() {
-	_invitMode = !_invitMode;
-	return(_invitMode);
-}
+	if (!isUserInChannel(user))
+		return (false);
 
-bool Channel::changeKey() {
-	_KeyMode = !_KeyMode;
-	return(_KeyMode);
+	operator_index = findOperator(user);
+	if (operator_index >= 0)
+	{
+		_operators.erase(i);
+		return (true);
+	}
+
+	return (false);
 }
