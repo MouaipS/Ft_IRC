@@ -5,22 +5,26 @@
 #include "cstdlib"
 
 class User {
+
 	public :
-		User(std::string username, std::string nickname, Channel home);
+			User();
 			~User();
 
 		//Geter
 		std::string getUsername() const;
 		std::string getNickname() const;
-		std::vector<std::string> getChannel() const;
 
 		//Setter
-		void ChangeNickname(std::string nickname);
+		void setNickname(std::string nickname);
+		void setUsername(std::string Username);
+
+		// Verification
+		bool isNicknameValid(std::string value);
+		bool isUsernameValid(std::string value);
 		
 	private :
-		const std::string _username;
-		std::string _nickname;
-		std::list<Channel> _MyChannels;
-};
 
-std::ostream &operator<<(std::ostream &os, const User &User);
+		bool isAuthed;
+		std::string _username;
+		std::string _nickname;
+};

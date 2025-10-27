@@ -1,20 +1,10 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(std::string name, std::string key, std::string topic) : _name(name), _isLimit(false), _key(key), _isKey(true), _topic(topic) {}
+Channel::Channel(std::string name) : _name(name) {}
 
 std::string Channel::getName() const {
 	return(_name);
-}
-
-/**
- * @return Null if _isKey == false !!!
- */
-std::string Channel::getKey() const {
-	if(_isKey == true)
-		return(_key);
-	else
-		return(NULL);
 }
 
 void Channel::changeLimit(int limit) {
@@ -38,18 +28,6 @@ void Channel::setLimit() {
 
 }
 
-void Channel::setKey(std::string key) {
-	if(key == "0") {
-		_isKey = false;
-		std::cout << "Key remove" << std::endl;
-	}
-	else {
-		_isKey = true;
-		_key = key;
-		std::cout << "New key set." << std::endl;
-	} 
-}
-
 void	Channel::addUser(User &user) {
 
 	if (_usersname.size() == LIMIT_USER)
@@ -64,4 +42,18 @@ const char*	Channel::UserLimitChannel::what() const throw() {
 
 std::vector<std::string> &Channel::getUsersname() {
 	return(_usersname);
+}
+
+std::vector<std::string> &Channel::getOperator() {
+	return(_operator);
+}
+
+bool Channel::changeInvite() {
+	_invitMode = !_invitMode;
+	return(_invitMode);
+}
+
+bool Channel::changeKey() {
+	_KeyMode = !_KeyMode;
+	return(_KeyMode);
 }

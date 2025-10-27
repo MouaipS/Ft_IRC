@@ -1,58 +1,10 @@
 #include "Server.hpp"
 
-Server::Server(): _name("SilkRoad"), _password("motdepasse") {
-
-	Channel	Home("home", "", "default channel");
-	_allChannels.push_back(Home);
-
-	User	Admin("Admin", "Admin", _allChannels.back());
-	_allUsers.push_back(Admin);
-}
-
-Server::Server(std::string name, std::string password): _name(name), _password(password) {
-
-	_allChannels.push_back(Channel("home", 0, "default channel"));
-	_allUsers.push_back(User("Admin", "God", _allChannels.back()));
-}
-
-Server::Server(const Server &obj) {
-
-	(void)obj;
-}
+Server::Server(std::string name, std::string password): _name(name), _password(password) {}
 
 Server::~Server() {}
 
 // F U N C T I O N S
-
-void	Server::userJoinServer(std::string userName) {
-
-	int	size = _allUsers.size();
-
-	for (int i = 0; i < size; i++) {
-
-		if (userName == _allUsers[i].getUsername())
-			throw UserNameAlreadyUsed();
-	}
-	_allUsers.push_back(User(userName, userName, _allChannels.back()));
-}
-
-void	Server::userJoinChannel(User &user, std::string chName) {
-
-	int	size = _allChannels.size();
-
-	for (int i = 0; i < size; i++) {
-
-		if (chName == _allChannels[i].getName()) {
-			
-			_allChannels[i].addUser(user);
-			return ;
-		}
-	}
-	if (_allChannels.size() == CHANNEL_LIMIT)
-		throw ServerLimitChannel();
-	_allChannels.push_back(Channel(chName, 0, 0));
-}
-
 
 void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 	int client_fd = accept(fd_actif, NULL, NULL);
@@ -63,12 +15,10 @@ void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 		fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 		dataEpoll.data.fd = client_fd;
 		epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
+		//instancier nouveau user(par def) pour l'ajouter a la map avec son bon fd
 		_client_fd.push_back(client_fd);
-		std::cout << "salut" << std::endl; 
-		//LE CLIENT RECOIT DES MESSAGES DE BIENVENUE PERSO
 	}
 }
-
 
 void	Server::initServer(std::string portNumber) {
 
@@ -117,7 +67,9 @@ void	Server::initServer(std::string portNumber) {
 				if(fd_actif == sockfd) {
 					NewClient(fd_actif, dataEpoll, epoll_fd);
 				} else {
-					//GESTION MESSAGE
+					str = getBuffer()//GESTION MESSAGE + IDCHECK/PSS
+					messageretour = parsBuffer(str) //split les arguments sans les checker
+					sendtoUser();
 				}
 			}
 		}

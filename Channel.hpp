@@ -2,38 +2,49 @@
 #include "iostream"
 #include <vector>
 
-#define LIMIT_USER 9999
-
 class User;
 
 class Channel {
 	public :
-		Channel(std::string name, std::string key, std::string topic);
+		Channel(std::string name);
+		~Channel();
 
-		std::string getKey() const;
 		std::string getName() const;
-		std::vector<std::string> &getUsersname();
-		void 	changeLimit(int limit);
-		void 	setLimit();
-		void 	setKey(std::string key);
-		void	addUser(User &user);
-		
+		std::string getTopic() const;
+		std::vector<User> &getUsers();
+		std::vector<User> &getOperators();
 
+		// Getters
+		bool getIsInviteMode() const;
+		std::string getTopic() const;
+		bool getIsRestrictionTopic() const;
+		std::string getKey() const;
+		bool getIsKeyProtected() const;
+		int getUserLimit() const;
+		bool getIsLimit() const;
+		
+		// Setters
+		void setIsInviteMode(bool value);
+		void setTopic(const std::string& value);
+		void setIsRestrictionTopic(bool value);
+		void setKey(const std::string& value);
+		void setIsKeyProtected(bool value);
+		void setUserLimit(int value);
+		void setIsLimit(bool value);
+		
 		class UserLimitChannel: public std::exception {
 			public: const char* what() const throw(); };
 
 	private :
 		std::string _name;
-		std::vector<std::string> _usersname;
-		std::vector<std::string> _banUser;
-		std::vector<std::string> _operator;
+		std::vector<User> _users; //liste des users presents dans le channel
+		std::vector<User> _operator; //liste des operateur du channel
 		
-		int _limit;
-		bool _isLimit;
-
-
-		std::string _key; 
-		bool _isKey;
-
+		bool _isInviteMode;
 		std::string _topic;
+		bool _isRestrictionTopic;
+		std::string _key;
+		bool _isKeyProtected;
+		int _userLimit;
+		bool _isLimit;
 };

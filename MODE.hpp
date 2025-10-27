@@ -1,5 +1,6 @@
 #pragma once 
 #include "ACommand.hpp"
+#include "algorithm"
 
 class Mode : public ACommand {
 	public :
