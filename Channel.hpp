@@ -11,15 +11,15 @@ class Channel {
 
 		// GET
 		std::string			getName() const;
-		std::vector<User>	&getUsers();
-		std::vector<User>	&getOperators();
+		std::vector<User*>	getUsers() const;
+		std::vector<User*>	getOperators() const;
 		std::string 		getTopic() const;
 		std::string			getKey() const;
 		bool				getIsInviteOnly() const;
 		bool				getIsTopicProtected() const;
 		bool				getIsKeyProtected() const;
 		bool				getIsLimit() const;
-		int					getUserLimit() const;
+		size_t				getUserLimit() const;
 		
 		// SET
 		void	setIsInviteOnly(bool value);
@@ -27,8 +27,8 @@ class Channel {
 		void	setIsTopicProtected(bool value);
 		void	setKey(const std::string& value);
 		void	setIsKeyProtected(bool value);
-		void	setUserLimit(int value);
 		void	setIsLimit(bool value);
+		void	setUserLimit(size_t value);
 
 		// Utils
 		size_t	findUser(User& user);
@@ -51,5 +51,5 @@ class Channel {
 		bool 				_isTopicProtected;
 		bool 				_isKeyProtected;
 		bool 				_isUserLimit;
-		int					_userLimit;
+		size_t				_userLimit;
 };

@@ -61,7 +61,7 @@ bool Channel::getIsLimit() const
     return _isUserLimit;
 }
 
-int Channel::getUserLimit() const
+size_t Channel::getUserLimit() const
 {
     return _userLimit;
 }
@@ -94,7 +94,7 @@ void Channel::setIsKeyProtected(bool value)
     _isKeyProtected = value;
 }
 
-void Channel::setUserLimit(int value)
+void Channel::setUserLimit(size_t value)
 {
     _userLimit = value;
 }
@@ -118,7 +118,7 @@ size_t	Channel::findUser(User& user)
 	return (-1);
 }
 
-size_t	Channel::findOperator(user& user)
+size_t	Channel::findOperator(User& user)
 {
 	for (size_t i = 0; i < _operators.size(); ++i)
 	{
@@ -151,11 +151,11 @@ bool Channel::removeUserFromChannel(User& user)
 	operator_index = findOperator(user);
 
 	if (operator_index >= 0)
-		_operators.erase(operator_index);
+		_operators.erase(_operators.begin() + operator_index);
 
 	if (user_index >= 0)
 	{
-		_users.erase(user_index);
+		_users.erase(_users.begin() + user_index);
 		return (true);
 	}
 
@@ -164,10 +164,10 @@ bool Channel::removeUserFromChannel(User& user)
 
 bool Channel::promoteUser(User &user)
 {
-	if (!isUserInChannel(user))
+	if (findUser(user) < 0)
 		return (false);
 
-	if (isUserInOperators(user))
+	if (findOperator(user) >= 0)
 		return (false);
 
 	_operators.push_back(&user);
@@ -179,13 +179,13 @@ bool Channel::demoteUser(User &user)
 {
 	size_t	operator_index;
 
-	if (!isUserInChannel(user))
+	if (findUser(user) < 0)
 		return (false);
 
 	operator_index = findOperator(user);
 	if (operator_index >= 0)
 	{
-		_operators.erase(i);
+		_operators.erase(_operators.begin() + operator_index);
 		return (true);
 	}
 
