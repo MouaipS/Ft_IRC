@@ -1,6 +1,7 @@
 #pragma once
 #include "Channel.hpp"
 #include "User.hpp"
+#include <sys/socket.h>
 #include <map>
 
 class ICommand {
@@ -21,5 +22,6 @@ class ICommand {
 
 	private:
 		bool	isUserValidAuth(User& user, bool pass, bool nick, bool username);
+		void	sendToUser(int fd, std::string message, int flag);
 
 };

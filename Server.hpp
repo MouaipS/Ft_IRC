@@ -65,7 +65,6 @@ class Server
 
 		// FUNCTIONS
 		void 	sendToCommand(std::vector<std::string> cmd, int fd_origin);
-		void	sendToUser(int fd, std::string message, int flag);
 		void	initServer(std::string portNumber);
 		void	initCommands();
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
