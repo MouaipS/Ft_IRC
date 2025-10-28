@@ -108,8 +108,16 @@ std::string	Server::getBuffer(int fd_actif) {
 	char		buffer[BUFFER_SIZE];
 	std::string	buffString;
 
-	rcvBytes = recv(fd_actif, buffer, sizeof(buffer) - 2, 0);
-	buffer[rcvBytes - 1] = '\r';
+	// Alors, actually, sans vouloir t'enfoncer:
+	/*
+	When reading messages from a stream, read the incoming data into a buffer.
+	Only parse and process a message once you encounter the \r\n at the end of it.
+	If you encounter an empty message, silently ignore it.
+	*/
+	// Il faut un buffer pour chaque fd,e t traiter le message uniquement une fois \r\n
+	rcvBytes = recv(fd_actif, buffer, sizeof(buffer) -2, 0);
+	std::cout << rcvBytes << std::endl;
+	buffer[rcvBytes - 1] = '\r'; //C'EST QUOI TA MERDE CA A PAS DE SENS : When reading messages from a stream, read the incoming data into a buffer. Only parse and process a message once you encounter the \r\n at the end of it. If you encounter an empty message, silently ignore it.
 	buffer[rcvBytes] = '\n';
 
 	buffString = buffer;
@@ -133,13 +141,9 @@ void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
 
 	if (it == _commands.end())
-		sendToUser(fd_origin, "Unknown command\r\n", 0); // Format unknown command
+		send(fd_origin, "Unknown command\r\n", 18, 0); // Format unknown command
 	else
 		it->second->execCmd(fd_origin, cmd, SERVERNAME, _password, _allChannels, _fdToUser);
-}
-
-void	Server::sendToUser(int fd, std::string message, int flag) {
-		send(fd, message.c_str(), message.length(), flag);
 }
 
 // E X C E P T I O N S

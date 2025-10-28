@@ -9,10 +9,12 @@ void CmdUser::execCmd(
     std::map<int, User*>& fdToUser
 ) {
     // TODO: Implémenter la commande User
-	(void) fd_origin;
-	(void) cmd;
-	(void) name;
-	(void) password;
-	(void) allChannels;
-	(void) fdToUser;	
+    (void) allChannels;
+    (void) password;
+    if (ICommand::isUserValidAuth(*fdToUser[fd_origin], 0, 0, 0)) {
+        fdToUser[fd_origin]->setUsername(cmd[1]);
+        std::string message = ":";
+        message = message + name + " 001 " + fdToUser[fd_origin]->getUsername() + " :Welcome to the IRC Network " + fdToUser[fd_origin]->getUsername() + "\r\n";  //001 RPL_WELCOME
+        ICommand::sendToUser(fd_origin, message, 0);
+    }
 }
