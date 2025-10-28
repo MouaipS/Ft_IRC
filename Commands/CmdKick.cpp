@@ -6,7 +6,7 @@ void CmdKick::execCmd(
     const std::string& name,
     const std::string& password,
     std::vector<Channel>& allChannels,
-    std::map<int, User>& fdToUser
+    std::map<int, User*>& fdToUser
 ) {
     // TODO: Implémenter la commande Kick
 }

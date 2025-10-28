@@ -1,12 +1,18 @@
 NAME = ircserv
 
 SOURCES = main.cpp \
-		  Server.cpp \
-		  User.cpp \
-		  Channel.cpp \
-		  Message.cpp \
-		  ACommand.cpp \
-		  KICK.cpp
+          Server.cpp \
+          User.cpp \
+          Channel.cpp \
+          Commands/CmdKick.cpp \
+          Commands/CmdInvite.cpp \
+          Commands/CmdTopic.cpp \
+          Commands/CmdMode.cpp \
+          Commands/CmdJoin.cpp \
+          Commands/CmdNick.cpp \
+          Commands/CmdPass.cpp \
+          Commands/CmdPrivmsg.cpp \
+          Commands/CmdUser.cpp
 
 OBJ = $(SOURCES:.cpp=.o)
 OBJDIR = objects
@@ -27,7 +33,7 @@ $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR)
+	mkdir -p $(OBJDIR) $(OBJDIR)/Commands
 
 fclean: clean
 	rm -f $(NAME)

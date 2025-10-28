@@ -4,9 +4,7 @@
 #include <algorithm>
 #include <string>
 
-User::User() {
-	_isAuthed = false;
-}
+User::User() : _isAuthed(false) {}
 
 User::~User() {}
 
@@ -35,7 +33,7 @@ void User::setUsername(std::string username) {
 }
 
 bool isAlphaNum(std::string name) {
-	for(int i=0; i != name.length(); i++) {
+	for(size_t i=0; i != name.length(); i++) {
 		if(!isalnum(name[i]))
 			return(false);
 	}
@@ -45,7 +43,7 @@ bool isAlphaNum(std::string name) {
 bool isCmdName(std::string name) {
 	std::string arr[] = {"KICK", "JOIN", "PASS", "MODE", "INVITE", "PRIVMSG", "MSG", "NICK"};
 
-	for(int i = 0; i != arr->length(); i++) {
+	for(size_t i = 0; i != arr->length(); i++) {
 		if(arr[i] == name)
 			return(false);
 	}
