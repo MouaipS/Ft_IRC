@@ -1,6 +1,6 @@
-#include "CmdPass.hpp"
+#include "CmdMode.hpp"
 
-void CmdPass::execCmd(
+void CmdMode::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,
     const std::string& name,
@@ -8,5 +8,5 @@ void CmdPass::execCmd(
     std::vector<Channel>& allChannels,
     std::map<int, User>& fdToUser
 ) {
-    // TODO: Implémenter la commande Pass
+    // TODO: Implémenter la commande Mode
 }

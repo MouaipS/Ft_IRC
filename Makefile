@@ -12,7 +12,7 @@ OBJ = $(SOURCES:.cpp=.o)
 OBJDIR = objects
 OBJECTS = $(addprefix $(OBJDIR)/, $(OBJ))
 
-CXXFLAGS = -g -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -g -Wall -Wextra -Werror -std=c++98 -I./ -ICommands/
 
 CXX = c++
 

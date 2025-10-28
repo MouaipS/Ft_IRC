@@ -1,9 +1,11 @@
 #include "Server.hpp"
 #include "ICommand.hpp"
 
-#define BUFFER_SIZE 512
-
-Server::Server(std::string name, std::string password): _name(name), _password(password) {}
+Server::Server(std::string port, std::string password): _port(port), _password(password) {
+	// CHECK if password is valid (exampl, 12 charactere mini)
+	// CHECK if port is in range, ex: 2000-65000
+	// QUIT if not
+}
 
 Server::~Server() {}
 
@@ -11,32 +13,35 @@ Server::~Server() {}
 
 void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 	int client_fd = accept(fd_actif, NULL, NULL);
-	if(client_fd == -1){
+	if(client_fd == -1)
+	{
 		std::cout << "Error: accept() failed" << std::endl;
-	} else {
-		int flags = fcntl(client_fd, F_GETFL, 0);
-		fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-		dataEpoll.data.fd = client_fd;
-		epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
-		//instancier nouveau user(par def) pour l'ajouter a la map avec son bon fd
-		_client_fd.push_back(client_fd);
+		return ;
 	}
+
+	int flags = fcntl(client_fd, F_GETFL, 0);
+	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+	dataEpoll.data.fd = client_fd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &dataEpoll);
+	_fdToUser.insert(std::make_pair(client_fd, new User()));
 }
 
 void	Server::initCommands() {
 
-	_commands.insert({"KICK", new CmdKick()});
-	_commands.insert({"INVITE", new CmdInvite()});
-	_commands.insert({"TOPIC", new CmdTopic()});
-	_commands.insert({"MODE", new CmdMode()});
-	_commands.insert({"JOIN", new CmdJoin()});
-	_commands.insert({"NICK", new CmdNick()});
-	_commands.insert({"PASS", new CmdPass()});
-	_commands.insert({"PRIVMSG", new CmdPrivmsg()});
-	_commands.insert({"USER", new CmdUser()});
+	_commands.insert(std::make_pair("KICK", new CmdKick()));
+	_commands.insert(std::make_pair("INVITE", new CmdInvite()));
+	_commands.insert(std::make_pair("TOPIC", new CmdTopic()));
+	_commands.insert(std::make_pair("MODE", new CmdMode()));
+	_commands.insert(std::make_pair("JOIN", new CmdJoin()));
+	_commands.insert(std::make_pair("NICK", new CmdNick()));
+	_commands.insert(std::make_pair("PASS", new CmdPass()));
+	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg()));
+	_commands.insert(std::make_pair("USER", new CmdUser()));
+
+	//TODO Il faut check si une des commandes est NULL et arreter le serveur si tel est le cas
 }
 
-void	Server::initServer(std::string portNumber) {
+void	Server::initServer(std::string port) {
 
 	memset(&hints, 0, sizeof(hints));
 
@@ -45,7 +50,7 @@ void	Server::initServer(std::string portNumber) {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo(NULL, portNumber.c_str(), &hints, &res)) {
+	if (getaddrinfo(NULL, port.c_str(), &hints, &res)) {
 		std::cout << "Error: while getaddrinfo" << std::endl;
 		return ;
 	}
@@ -89,8 +94,7 @@ void	Server::initServer(std::string portNumber) {
 				} else {
 					str = getBuffer(fd_actif);//GESTION MESSAGE + IDCHECK/PSS
 					args = splitBuffer(str); //split les arguments sans les checker
-					fdAndMessage = sendToCommand(args, fd_actif);
-					sendToUsers(fdAndMessage);
+					sendToCommand(args, fd_actif);
 				}
 			}
 		}
@@ -123,30 +127,19 @@ std::vector<std::string> Server::splitBuffer(std::string str) {
 	return (cmd);
 }
 
-std::map<int, std::string>	Server::sendToCommand(std::vector<std::string> cmd, int fd) {
-
+void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
+{
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
-	std::map<int, std::string>	infoReturn;
 
 	if (it == _commands.end())
-		infoReturn.insert({fd, ":Unknow command"});
+		sendToUser(fd_origin, "Unknown command", 0); // Format unknown command
 	else
-		infoReturn = it->second->execCmd(fd, cmd, _name, _password, _allChannels, _fdToUser);
-
-	return (infoReturn);
+		it->second->execCmd(fd_origin, cmd, SERVERNAME, _password, _allChannels, _fdToUser);
 }
 
-void	Server::sendToUsers(std::map<int, std::string>& fdAndMessage) {
-
-	std::map<int, std::string>::iterator	it = fdAndMessage.begin();
-
-	for (; it != fdAndMessage.end(); it++) {
-
-		send(it->first, it->second.c_str(), it->second.size(), 0);	
-		it++;
-	}
+void	Server::sendToUser(int fd, std::string message, int flag) {
+		send(fd, message.c_str(), message.length(), flag);
 }
-
 
 // E X C E P T I O N S
 

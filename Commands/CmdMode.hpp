@@ -1,9 +1,9 @@
 #pragma once
 #include "ICommand.hpp"
 
-class CmdPass : public ICommand {
+class CmdMode : public ICommand {
 public:
-    virtual ~CmdPass() {}
+    virtual ~CmdMode() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

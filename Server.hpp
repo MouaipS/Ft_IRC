@@ -2,6 +2,7 @@
 
 #include <list>
 #include "Channel.hpp"
+#include "ICommand.hpp"
 #include "User.hpp"
 #include <stdexcept>
 #include <sys/socket.h>
@@ -10,11 +11,19 @@
 #include <bits/stdc++.h>
 #include <fcntl.h>
 #include "sys/epoll.h"
-#include "ICommand.hpp"
-
+#include "CmdKick.hpp"
+#include "CmdInvite.hpp"
+#include "CmdTopic.hpp"
+#include "CmdMode.hpp"
+#include "CmdJoin.hpp"
+#include "CmdNick.hpp"
+#include "CmdPass.hpp"
+#include "CmdPrivmsg.hpp"
+#include "CmdUser.hpp"
 
 #define CHANNEL_LIMIT	1000
 #define SERVERNAME "irCnews"
+#define BUFFER_SIZE 512
 
 enum command {
 
@@ -32,7 +41,7 @@ enum command {
 class Server
 {
 	public:
-		Server(std::string name, std::string password);
+		Server(std::string port, std::string password);
 		~Server();
 
 		// EXCEPTIONS
@@ -44,10 +53,10 @@ class Server
 			public: const char* what() const throw(); };
 
 	private:
-		const std::string				_name;
-		const std::string				_password;  //fonction du Hash
+		const std::string				_port;
+		const std::string				_password;
 		std::vector<Channel>			_allChannels;
-		std::map<int, User>				_fdToUser;
+		std::map<int, User*>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
 
 		addrinfo			hints;
@@ -55,8 +64,8 @@ class Server
 		int					sockfd;
 
 		// FUNCTIONS
-		std::map<int, std::string>	sendToCommand(std::vector<std::string> cmd, int fd);
-		void	sendToUsers(std::map<int, std::string>&);
+		void 	sendToCommand(std::vector<std::string> cmd, int fd_origin);
+		void	sendToUser(int fd, std::string message, int flag);
 		void	initServer(std::string portNumber);
 		void	initCommands();
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
