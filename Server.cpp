@@ -23,15 +23,15 @@ void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 
 void	Server::initCommands() {
 
-	_commands.insert({"KICK", new Kick()});
-	_commands.insert({"INVITE", new Invite()});
-	_commands.insert({"TOPIC", new Topic()});
-	_commands.insert({"MODE", new Mode()});
-	_commands.insert({"JOIN", new Join()});
-	_commands.insert({"NICK", new Nick()});
-	_commands.insert({"PASS", new Pass()});
-	_commands.insert({"MSSG", new Mssg()});
-	_commands.insert({"USER", new User()});
+	_commands.insert({"KICK", new CmdKick()});
+	_commands.insert({"INVITE", new CmdInvite()});
+	_commands.insert({"TOPIC", new CmdTopic()});
+	_commands.insert({"MODE", new CmdMode()});
+	_commands.insert({"JOIN", new CmdJoin()});
+	_commands.insert({"NICK", new CmdNick()});
+	_commands.insert({"PASS", new CmdPass()});
+	_commands.insert({"PRIVMSG", new CmdPrivmsg()});
+	_commands.insert({"USER", new CmdUser()});
 }
 
 void	Server::initServer(std::string portNumber) {
