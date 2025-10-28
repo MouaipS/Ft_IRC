@@ -6,8 +6,8 @@
 class ICommand {
 
 	public:
-		virtual ~ICommand();
-		virtual std::map<std::vector<User>, std::string> execCmd (	
+		virtual std::map<std::vector<int>, std::string> execCmd (	
+					int							fd,
 					std::vector<std::string>&	cmd,
 					const std::string&			name,
 					const std::string&			password,
@@ -15,6 +15,8 @@ class ICommand {
 					std::map<User, int>&		fdToUser
 		) = 0;
 
-	private :
-		//recoit les arguments et doit les parser
+		class UserNotFoundException: public std::exception {
+			public: const char* what() const throw();
+		};
+
 };
