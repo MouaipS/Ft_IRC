@@ -1,6 +1,8 @@
 #include "Server.hpp"
 #include "ICommand.hpp"
 
+#define BUFFER_SIZE 512
+
 Server::Server(std::string name, std::string password): _name(name), _password(password) {}
 
 Server::~Server() {}
@@ -85,14 +87,28 @@ void	Server::initServer(std::string portNumber) {
 				if(fd_actif == sockfd) {
 					NewClient(fd_actif, dataEpoll, epoll_fd);
 				} else {
-					str = getBuffer();//GESTION MESSAGE + IDCHECK/PSS
+					str = getBuffer(fd_actif);//GESTION MESSAGE + IDCHECK/PSS
 					args = splitBuffer(str); //split les arguments sans les checker
-					fdAndMessage = sendToCommand(args);
+					fdAndMessage = sendToCommand(args, fd_actif);
 					sendToUsers(fdAndMessage);
 				}
 			}
 		}
 	}
+}
+
+std::string	Server::getBuffer(int fd_actif) {
+
+	int			rcvBytes;
+	char		buffer[BUFFER_SIZE];
+	std::string	buffString;
+
+	rcvBytes = recv(fd_actif, buffer, sizeof(buffer) - 2, 0);
+	buffer[rcvBytes - 1] = '\r';
+	buffer[rcvBytes] = '\n';
+
+	buffString = buffer;
+	return (buffString);
 }
 
 std::vector<std::string> Server::splitBuffer(std::string str) {
@@ -107,20 +123,30 @@ std::vector<std::string> Server::splitBuffer(std::string str) {
 	return (cmd);
 }
 
-std::map<int, std::string>	Server::sendToCommand(std::vector<std::string> cmd) {
+std::map<int, std::string>	Server::sendToCommand(std::vector<std::string> cmd, int fd) {
 
-	std::map<std::string, ICommand*>::iterator	it;
+	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
+	std::map<int, std::string>	infoReturn;
 
-	it = _commands.find(cmd[0]);
 	if (it == _commands.end())
-		throw InvalidCommand();
+		infoReturn.insert({fd, ":Unknow command"});
+	else
+		infoReturn = it->second->execCmd(fd, cmd, _name, _password, _allChannels, _fdToUser);
 
-	it->second->execCmd(cmd, _name, _password, _allChannels, _fdToUser);
+	return (infoReturn);
 }
 
-void	Server::sendToUsers(std::map<int, std::string>) {
+void	Server::sendToUsers(std::map<int, std::string>& fdAndMessage) {
 
+	std::map<int, std::string>::iterator	it = fdAndMessage.begin();
+
+	for (; it != fdAndMessage.end(); it++) {
+
+		send(it->first, it->second.c_str(), it->second.size(), 0);	
+		it++;
+	}
 }
+
 
 // E X C E P T I O N S
 

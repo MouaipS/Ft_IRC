@@ -25,7 +25,7 @@ enum command {
 	JOIN,
 	NICK,
 	PASS,
-	MSSG,
+	PRIVMSG,
 	USER
 };
 
@@ -47,7 +47,7 @@ class Server
 		const std::string				_name;
 		const std::string				_password;  //fonction du Hash
 		std::vector<Channel>			_allChannels;
-		std::map<User, int>				_fdToUser;
+		std::map<int, User>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
 
 		addrinfo			hints;
@@ -55,10 +55,11 @@ class Server
 		int					sockfd;
 
 		// FUNCTIONS
-		std::map<int, std::string>	sendToCommand(std::vector<std::string> cmd);
-		void	sendToUsers(std::map<int, std::string>);
+		std::map<int, std::string>	sendToCommand(std::vector<std::string> cmd, int fd);
+		void	sendToUsers(std::map<int, std::string>&);
 		void	initServer(std::string portNumber);
 		void	initCommands();
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
 		std::vector<std::string>	splitBuffer(std::string str);
+		std::string	getBuffer(int fd_actif);
 };
