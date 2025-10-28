@@ -233,3 +233,30 @@ void Channel::demoteUser(User &user)
 
 	_operators.erase(_operators.begin() + operator_index);
 }
+
+// Exceptions
+
+const char* Channel::ChannelUserLimitExceededException::what() const throw()
+{
+    return ("Channel user limit exceeded.");
+}
+
+const char* Channel::UserNotFoundInChannelException::what() const throw()
+{
+    return ("User not found in channel.");
+}
+
+const char* Channel::UserNotOperatorException::what() const throw()
+{
+    return ("User is not an operator.");
+}
+
+const char* Channel::UserAlreadyInChannelException::what() const throw()
+{
+    return ("User is already in the channel.");
+}
+
+const char* Channel::UserAlreadyOperatorException::what() const throw()
+{
+    return ("User is already an operator.");
+}
