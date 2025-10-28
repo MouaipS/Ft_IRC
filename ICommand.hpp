@@ -7,12 +7,13 @@ class ICommand {
 
 	public:
 		virtual ~ICommand();
-		virtual std::map<std::vector<User>, std::string> execCmd (	
+		virtual std::map<int, std::string> execCmd (	
+					int							fd,
 					std::vector<std::string>&	cmd,
 					const std::string&			name,
 					const std::string&			password,
 					std::vector<Channel>&		allChannels,
-					std::map<User, int>&		fdToUser
+					std::map<int, User>&		fdToUser
 		) = 0;
 
 	private :
