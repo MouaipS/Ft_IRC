@@ -3,7 +3,6 @@
 
 class CmdPrivmsg : public ICommand {
 public:
-    virtual ~CmdPrivmsg() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

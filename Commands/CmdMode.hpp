@@ -3,7 +3,6 @@
 
 class CmdMode : public ICommand {
 public:
-    virtual ~CmdMode() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

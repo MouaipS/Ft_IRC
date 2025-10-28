@@ -6,7 +6,6 @@
 class ICommand {
 
 	public:
-		virtual ~ICommand();
 		virtual void execCmd (	
 					int							fd,
 					std::vector<std::string>&	cmd,

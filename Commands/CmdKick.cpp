@@ -9,4 +9,10 @@ void CmdKick::execCmd(
     std::map<int, User*>& fdToUser
 ) {
     // TODO: Implémenter la commande Kick
+	(void) fd_origin;
+	(void) cmd;
+	(void) name;
+	(void) password;
+	(void) allChannels;
+	(void) fdToUser;	
 }

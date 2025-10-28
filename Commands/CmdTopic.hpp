@@ -3,7 +3,6 @@
 
 class CmdTopic : public ICommand {
 public:
-    virtual ~CmdTopic() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

@@ -3,7 +3,6 @@
 
 class CmdPass : public ICommand {
 public:
-    virtual ~CmdPass() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

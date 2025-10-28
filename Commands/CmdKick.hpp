@@ -3,7 +3,6 @@
 
 class CmdKick : public ICommand {
 public:
-    virtual ~CmdKick() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

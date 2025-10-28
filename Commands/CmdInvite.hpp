@@ -3,7 +3,6 @@
 
 class CmdInvite : public ICommand {
 public:
-    virtual ~CmdInvite() {}
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,
