@@ -108,12 +108,12 @@ void Channel::setIsLimit(bool value)
 // ------------- UTILS  ------------- //
 
 /**
- * @brief Recherche un utilisateur dans la liste des utilisateurs du canal.
+ * @brief Searches for a user in the channel's user list.
  * 
- * @param user Référence vers l'utilisateur à rechercher.
+ * @param user Reference to the user to search for.
  * @return int
- * - L'indice (position) de l'utilisateur dans le vecteur `_users` s'il est trouvé.
- * - Retourne `-1` si l'utilisateur n'est pas présent dans le canal.
+ * - The index (position) of the user in the `_users` vector if found.
+ * - Returns `-1` if the user is not present in the channel.
  */
 int Channel::findUser(User& user)
 {
@@ -126,12 +126,12 @@ int Channel::findUser(User& user)
 }
 
 /**
- * @brief Recherche un utilisateur dans la liste des opérateurs du canal.
+ * @brief Searches for a user in the channel's operator list.
  * 
- * @param user Référence vers l'utilisateur à rechercher.
+ * @param user Reference to the user to search for.
  * @return int
- * - L'indice (position) de l'utilisateur dans le vecteur `_operators` s'il est trouvé.
- * - Retourne `-1` si l'utilisateur n'est pas opérateur du canal.
+ * - The index (position) of the user in the `_operators` vector if found.
+ * - Returns `-1` if the user is not an operator in the channel.
  */
 int Channel::findOperator(User& user)
 {
@@ -144,14 +144,14 @@ int Channel::findOperator(User& user)
 }
 
 /**
- * @brief Ajoute un utilisateur au canal.
+ * @brief Adds a user to the channel.
  * 
- * @param user Référence vers l'utilisateur à ajouter.
- * @throw ChannelUserLimitExceededException si la limite d'utilisateurs est atteinte.
- * @throw UserAlreadyInChannelException si l'utilisateur est déjà présent dans le canal.
+ * @param user Reference to the user to add.
+ * @throw ChannelUserLimitExceededException if the user limit has been reached.
+ * @throw UserAlreadyInChannelException if the user is already in the channel.
  * 
- * Ajoute l'utilisateur à la liste `_users` si le canal n'a pas atteint sa limite
- * et que l'utilisateur n'est pas déjà présent.
+ * Adds the user to the `_users` list if the channel has not reached its limit
+ * and if the user is not already present.
  */
 void Channel::addUserToChannel(User& user)
 {
@@ -165,13 +165,13 @@ void Channel::addUserToChannel(User& user)
 }
 
 /**
- * @brief Retire un utilisateur du canal (et de la liste des opérateurs s'il en fait partie).
+ * @brief Removes a user from the channel (and from the operator list if applicable).
  * 
- * @param user Référence vers l'utilisateur à retirer.
- * @throw UserNotFoundInChannelException si l'utilisateur n'est pas présent dans le canal.
+ * @param user Reference to the user to remove.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
  * 
- * Supprime l'utilisateur de la liste `_users`, et également de `_operators`
- * si celui-ci faisait partie des opérateurs.
+ * Removes the user from the `_users` list, and also from `_operators`
+ * if they were an operator.
  */
 void Channel::removeUserFromChannel(User& user)
 {
@@ -191,14 +191,14 @@ void Channel::removeUserFromChannel(User& user)
 }
 
 /**
- * @brief Promeut un utilisateur au rôle d'opérateur du canal.
+ * @brief Promotes a user to channel operator.
  * 
- * @param user Référence vers l'utilisateur à promouvoir.
- * @throw UserNotFoundInChannelException si l'utilisateur n'est pas présent dans le canal.
- * @throw UserAlreadyOperatorException si l'utilisateur est déjà opérateur.
+ * @param user Reference to the user to promote.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
+ * @throw UserAlreadyOperatorException if the user is already an operator.
  * 
- * Ajoute l'utilisateur à la liste `_operators` s'il fait partie du canal
- * et qu'il n'est pas déjà opérateur.
+ * Adds the user to the `_operators` list if they are part of the channel
+ * and not already an operator.
  */
 void Channel::promoteUser(User &user)
 {
@@ -212,13 +212,13 @@ void Channel::promoteUser(User &user)
 }
 
 /**
- * @brief Rétrograde un opérateur en simple utilisateur.
+ * @brief Demotes an operator to a regular user.
  * 
- * @param user Référence vers l'utilisateur à rétrograder.
- * @throw UserNotFoundInChannelException si l'utilisateur n'est pas présent dans le canal.
- * @throw UserNotOperatorException si l'utilisateur n'est pas opérateur.
+ * @param user Reference to the user to demote.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
+ * @throw UserNotOperatorException if the user is not an operator.
  * 
- * Supprime l'utilisateur de la liste `_operators` s'il est trouvé.
+ * Removes the user from the `_operators` list if found.
  */
 void Channel::demoteUser(User &user)
 {
