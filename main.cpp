@@ -6,7 +6,7 @@
 
 int main (int argc, char **argv) {
 
-	if (argc != 2)
+	if (argc != 3)
 	{
 		std::cout << "Bad arguments : " << argv[0] << " <PORT> <PASSWORD>" << std::endl;
 		return (2);

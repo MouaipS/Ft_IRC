@@ -5,6 +5,7 @@ Server::Server(std::string port, std::string password): _port(port), _password(p
 	// CHECK if password is valid (exampl, 12 charactere mini)
 	// CHECK if port is in range, ex: 2000-65000
 	// QUIT if not
+	initServer(_port);
 }
 
 Server::~Server() {}
@@ -132,7 +133,7 @@ void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
 
 	if (it == _commands.end())
-		sendToUser(fd_origin, "Unknown command", 0); // Format unknown command
+		sendToUser(fd_origin, "Unknown command\r\n", 0); // Format unknown command
 	else
 		it->second->execCmd(fd_origin, cmd, SERVERNAME, _password, _allChannels, _fdToUser);
 }
