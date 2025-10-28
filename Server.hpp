@@ -10,11 +10,24 @@
 #include <bits/stdc++.h>
 #include <fcntl.h>
 #include "sys/epoll.h"
-
+#include "ICommand.hpp"
 
 
 #define CHANNEL_LIMIT	1000
 #define SERVERNAME "irCnews"
+
+enum command {
+
+	KICK,
+	INVITE,
+	TOPIC,
+	MODE,
+	JOIN,
+	NICK,
+	PASS,
+	MSSG,
+	USER
+};
 
 class Server
 {
@@ -32,17 +45,20 @@ class Server
 
 	private:
 		const std::string				_name;
-		const std::string				_password;  //fonction du H
+		const std::string				_password;  //fonction du Hash
 		std::vector<Channel>			_allChannels;
 		std::map<User, int>				_fdToUser;
+		std::map<std::string, ICommand*>	_commands;
 
 		addrinfo			hints;
 		addrinfo			*res;
 		int					sockfd;
 
 		// FUNCTIONS
+		std::map<int, std::string>	sendToCommand(std::vector<std::string> cmd);
+		void	sendToUsers(std::map<int, std::string>);
 		void	initServer(std::string portNumber);
+		void	initCommands();
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
-
-
+		std::vector<std::string>	splitBuffer(std::string str);
 };

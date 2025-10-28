@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "ICommand.hpp"
 
 Server::Server(std::string name, std::string password): _name(name), _password(password) {}
 
@@ -18,6 +19,19 @@ void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 		//instancier nouveau user(par def) pour l'ajouter a la map avec son bon fd
 		_client_fd.push_back(client_fd);
 	}
+}
+
+void	Server::initCommands() {
+
+	_commands.insert({"KICK", new Kick()});
+	_commands.insert({"INVITE", new Invite()});
+	_commands.insert({"TOPIC", new Topic()});
+	_commands.insert({"MODE", new Mode()});
+	_commands.insert({"JOIN", new Join()});
+	_commands.insert({"NICK", new Nick()});
+	_commands.insert({"PASS", new Pass()});
+	_commands.insert({"MSSG", new Mssg()});
+	_commands.insert({"USER", new User()});
 }
 
 void	Server::initServer(std::string portNumber) {
@@ -51,7 +65,11 @@ void	Server::initServer(std::string portNumber) {
 		freeaddrinfo(res);
 		return ;
 	}
-
+	
+	initCommands();
+	std::vector<std::string>	args;
+	std::map<int, std::string>	fdAndMessage;
+	std::string					str;
 	int epoll_fd = epoll_create(1);
 	epoll_event dataEpoll, events[180];
 	dataEpoll.events = EPOLLIN;
@@ -67,16 +85,42 @@ void	Server::initServer(std::string portNumber) {
 				if(fd_actif == sockfd) {
 					NewClient(fd_actif, dataEpoll, epoll_fd);
 				} else {
-					str = getBuffer()//GESTION MESSAGE + IDCHECK/PSS
-					messageretour = parsBuffer(str) //split les arguments sans les checker
-					sendtoUser();
+					str = getBuffer();//GESTION MESSAGE + IDCHECK/PSS
+					args = splitBuffer(str); //split les arguments sans les checker
+					fdAndMessage = sendToCommand(args);
+					sendToUsers(fdAndMessage);
 				}
 			}
 		}
 	}
 }
 
+std::vector<std::string> Server::splitBuffer(std::string str) {
 
+	std::vector<std::string>					cmd;
+	std::stringstream							ss(str);
+	std::string									buffer;
+
+	while (getline(ss, buffer, ' '))
+		cmd.push_back(buffer);
+
+	return (cmd);
+}
+
+std::map<int, std::string>	Server::sendToCommand(std::vector<std::string> cmd) {
+
+	std::map<std::string, ICommand*>::iterator	it;
+
+	it = _commands.find(cmd[0]);
+	if (it == _commands.end())
+		throw InvalidCommand();
+
+	it->second->execCmd(cmd, _name, _password, _allChannels, _fdToUser);
+}
+
+void	Server::sendToUsers(std::map<int, std::string>) {
+
+}
 
 // E X C E P T I O N S
 
