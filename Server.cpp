@@ -169,7 +169,7 @@ void	Server::updateUserBuffer(int fd_actif, User* user) {
 
 	if (!user)
 		return ;
-		
+	std::memset(buffer, '\0', BUFFER_SIZE);
 	rcvBytes = recv(fd_actif, buffer, sizeof(buffer), 0);
 	if (rcvBytes == -1)
 		return ;
