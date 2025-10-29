@@ -13,4 +13,11 @@ int main (int argc, char **argv) {
 	}
 
 	Server	ircSERV = Server(argv[1], argv[2]);
+	try
+	{
+		ircSERV.initServer(argv[1]);
+		ircSERV.initCommands();
+	}
+	catch (std::exception& e) {std::cout << e.what() << std::endl; }
+	ircSERV.epollServer();
 }

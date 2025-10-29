@@ -5,7 +5,7 @@ const char* ICommand::UserNotFoundException::what() const throw()
 	return ("User not found in server list.");
 }
 
-bool	isUserValidAuth(User& user, bool pass, bool nick, bool username)
+bool	ICommand::isUserValidAuth(User& user, bool pass, bool nick, bool username)
 {
 	if (pass && !user.getIsAuthed())
 		return (false);
@@ -16,7 +16,7 @@ bool	isUserValidAuth(User& user, bool pass, bool nick, bool username)
 	return (true);
 }
 
-void	sendToUser(int fd, std::string message, int flag)
+void	ICommand::sendToUser(int fd, std::string message, int flag)
 {
 	send(fd, message.c_str(), message.length(), flag);
 }

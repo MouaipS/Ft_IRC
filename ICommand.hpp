@@ -20,7 +20,6 @@ class ICommand {
 			public: const char* what() const throw();
 		};
 
-	private:
 		bool	isUserValidAuth(User& user, bool pass, bool nick, bool username);
 		void	sendToUser(int fd, std::string message, int flag);
 

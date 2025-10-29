@@ -4,6 +4,7 @@ SOURCES = main.cpp \
           Server.cpp \
           User.cpp \
           Channel.cpp \
+          ICommand.cpp \
           Commands/CmdKick.cpp \
           Commands/CmdInvite.cpp \
           Commands/CmdTopic.cpp \
