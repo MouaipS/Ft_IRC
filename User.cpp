@@ -46,9 +46,9 @@ bool isAlphaNum(std::string name) {
 }
 
 bool isCmdName(std::string name) {
-	std::string arr[] = {"KICK", "JOIN", "PASS", "MODE", "INVITE", "PRIVMSG", "MSG", "NICK"};
+	std::string arr[8] = {"KICK", "JOIN", "PASS", "MODE", "INVITE", "PRIVMSG", "MSG", "NICK"};
 
-	for(size_t i = 0; i != arr->length(); i++) {
+	for(size_t i = 0; i != 8; i++) {
 		if(arr[i] == name)
 			return(false);
 	}
