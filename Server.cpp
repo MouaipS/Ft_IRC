@@ -1,21 +1,19 @@
 #include "Server.hpp"
 #include "ICommand.hpp"
+#include <vector>
 
-Server::Server(std::string port, std::string password): _port(port), _password(password) {
-	// CHECK if password is valid (exampl, 12 charactere mini)
-	// CHECK if port is in range, ex: 2000-65000
-	// QUIT if not
-	initServer(_port);
-}
+Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
 Server::~Server() {}
 
 // F U N C T I O N S
 
 void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
+
 	int client_fd = accept(fd_actif, NULL, NULL);
-	if(client_fd == -1)
-	{
+
+	if (client_fd == -1) {
+
 		std::cout << "Error: accept() failed" << std::endl;
 		return ;
 	}
@@ -38,61 +36,63 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("PASS", new CmdPass()));
 	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg()));
 	_commands.insert(std::make_pair("USER", new CmdUser()));
-
-	//TODO Il faut check si une des commandes est NULL et arreter le serveur si tel est le cas
 }
 
 void	Server::initServer(std::string port) {
 
 	memset(&hints, 0, sizeof(hints));
 
+	std::cout << "init Server" << std::endl;
 	res = NULL;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo(NULL, port.c_str(), &hints, &res)) {
-		std::cout << "Error: while getaddrinfo" << std::endl;
-		return ;
-	}
+	if (getaddrinfo(NULL, port.c_str(), &hints, &res))
+		throw GetAddrInfoFail();
 
 	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sockfd == -1) {
 		freeaddrinfo(res);
-		std::cout << "Error: socket() failed" << std::endl;
-		return ;
+		throw SocketFail();
 	}
 	
-	if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-		std::cout << "Error: bind() failed" << std::endl;
-		return ;
+	else if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
+		freeaddrinfo(res);
+		throw BindFail();
 	}
 
-	if (listen(sockfd, 10) == -1) {
-		std::cout << "Error: listen() failed" << std::endl;
+	else if (listen(sockfd, 10) == -1) {
 		freeaddrinfo(res);
-		return ;
+		throw ListenFail();
 	}
-	
-	initCommands();
+}
+
+void	Server::epollServer()
+{
 	std::vector<std::string>	args;
 	std::map<int, std::string>	fdAndMessage;
 	std::string					str;
-	int epoll_fd = epoll_create(1);
+	int 						epoll_fd = epoll_create(1);
+
 	epoll_event dataEpoll, events[180];
 	dataEpoll.events = EPOLLIN;
 	dataEpoll.data.fd = sockfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &dataEpoll);
 
-	while(1) {
+	while (1)
+	{
 		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
-		if(nb_event != -1){
-			for(int i = 0; i < nb_event; i++) {
+		if (nb_event != -1)
+		{
+			for (int i = 0; i < nb_event; i++)
+			{
 				int fd_actif = events[i].data.fd;
 
-				if(fd_actif == sockfd) {
+				if (fd_actif == sockfd)
 					NewClient(fd_actif, dataEpoll, epoll_fd);
-				} else {
+				else
+				{
 					str = getBuffer(fd_actif);//GESTION MESSAGE + IDCHECK/PSS
 					args = splitBuffer(str); //split les arguments sans les checker
 					sendToCommand(args, fd_actif);
@@ -133,7 +133,7 @@ void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
 
 	if (it == _commands.end())
-		sendToUser(fd_origin, "Unknown command\r\n", 0); // Format unknown command
+		sendToUser(fd_origin, "Unknown command", 0); // Format unknown command
 	else
 		it->second->execCmd(fd_origin, cmd, SERVERNAME, _password, _allChannels, _fdToUser);
 }
@@ -152,3 +152,24 @@ const char*	Server::UserNameAlreadyUsed::what() const throw() {
 
 const char* Server::ServerLimitChannel::what() const throw() {
 	return ("Can't create more channels"); }
+
+const char* Server::NullCommand::what() const throw() {
+	return ("Failed during commands initialisation"); }
+
+const char* Server::GetAddrInfoFail::what() const throw() {
+	return ("getaddrinfo() failed"); }
+
+const char* Server::SocketFail::what() const throw() {
+	return ("socket() failed"); }
+
+const char* Server::BindFail::what() const throw() {
+	return ("bind() failed"); }
+
+const char* Server::ListenFail::what() const throw() {
+	return ("listen() failed"); }
+
+const char* Server::PasswordRules::what() const throw() {
+	return ("Password must be at least 12 characters long"); }
+
+const char* Server::PortOutOfRange::what() const throw() {
+	return ("Port number must be between 1025 and 65535"); }

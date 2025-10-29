@@ -44,12 +44,30 @@ class Server
 		Server(std::string port, std::string password);
 		~Server();
 
+		void	initServer(std::string portNumber);
+		void	epollServer();
+		void	initCommands();
+
 		// EXCEPTIONS
 		class ServerLimitUser: public std::exception {
 			public: const char* what() const throw(); };
 		class UserNameAlreadyUsed: public std::exception {
 			public: const char* what() const throw(); };
 		class ServerLimitChannel: public std::exception {
+			public: const char* what() const throw(); };
+		class NullCommand: public std::exception {
+			public: const char* what() const throw(); };
+		class GetAddrInfoFail: public std::exception {
+			public: const char* what() const throw(); };
+		class SocketFail: public std::exception {
+			public: const char* what() const throw(); };
+		class BindFail: public std::exception {
+			public: const char* what() const throw(); };
+		class ListenFail: public std::exception {
+			public: const char* what() const throw(); };
+		class PasswordRules: public std::exception {
+			public: const char* what() const throw(); };
+		class PortOutOfRange: public std::exception {
 			public: const char* what() const throw(); };
 
 	private:
@@ -64,9 +82,8 @@ class Server
 		int					sockfd;
 
 		// FUNCTIONS
-		void 	sendToCommand(std::vector<std::string> cmd, int fd_origin);
-		void	initServer(std::string portNumber);
-		void	initCommands();
+		void	sendToCommand(std::vector<std::string> cmd, int fd_origin);
+		void	sendToUser(int fd, std::string message, int flag);
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
 		std::vector<std::string>	splitBuffer(std::string str);
 		std::string	getBuffer(int fd_actif);
