@@ -42,7 +42,6 @@ void	Server::initServer(std::string port) {
 
 	memset(&hints, 0, sizeof(hints));
 
-	std::cout << "init Server" << std::endl;
 	res = NULL;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -108,17 +107,8 @@ std::string	Server::getBuffer(int fd_actif) {
 	char		buffer[BUFFER_SIZE];
 	std::string	buffString;
 
-	// Alors, actually, sans vouloir t'enfoncer:
-	/*
-	When reading messages from a stream, read the incoming data into a buffer.
-	Only parse and process a message once you encounter the \r\n at the end of it.
-	If you encounter an empty message, silently ignore it.
-	*/
-	// Il faut un buffer pour chaque fd,e t traiter le message uniquement une fois \r\n
-	rcvBytes = recv(fd_actif, buffer, sizeof(buffer) -2, 0);
+	rcvBytes = recv(fd_actif, buffer, sizeof(buffer), 0);
 	std::cout << rcvBytes << std::endl;
-	buffer[rcvBytes - 1] = '\r'; //C'EST QUOI TA MERDE CA A PAS DE SENS : When reading messages from a stream, read the incoming data into a buffer. Only parse and process a message once you encounter the \r\n at the end of it. If you encounter an empty message, silently ignore it.
-	buffer[rcvBytes] = '\n';
 
 	buffString = buffer;
 	return (buffString);
