@@ -16,6 +16,11 @@ std::string User::getNickname() const {
 	return(_nickname);
 }
 
+std::string& User::getBuffer()
+{
+	return (_buffer);
+}
+
 bool User::getIsAuthed() const {
 	return(_isAuthed);
 }

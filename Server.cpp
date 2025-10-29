@@ -1,21 +1,19 @@
 #include "Server.hpp"
 #include "ICommand.hpp"
+#include <vector>
 
-Server::Server(std::string port, std::string password): _port(port), _password(password) {
-	// CHECK if password is valid (exampl, 12 charactere mini)
-	// CHECK if port is in range, ex: 2000-65000
-	// QUIT if not
-	initServer(_port);
-}
+Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
 Server::~Server() {}
 
 // F U N C T I O N S
 
 void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
+
 	int client_fd = accept(fd_actif, NULL, NULL);
-	if(client_fd == -1)
-	{
+
+	if (client_fd == -1) {
+
 		std::cout << "Error: accept() failed" << std::endl;
 		return ;
 	}
@@ -38,96 +36,149 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("PASS", new CmdPass()));
 	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg()));
 	_commands.insert(std::make_pair("USER", new CmdUser()));
-
-	//TODO Il faut check si une des commandes est NULL et arreter le serveur si tel est le cas
 }
 
 void	Server::initServer(std::string port) {
 
-	memset(&hints, 0, sizeof(hints));
+	memset(&_hints, 0, sizeof(_hints));
 
-	res = NULL;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
+	_res = NULL;
+	_hints.ai_family = AF_UNSPEC;
+	_hints.ai_socktype = SOCK_STREAM;
+	_hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo(NULL, port.c_str(), &hints, &res)) {
-		std::cout << "Error: while getaddrinfo" << std::endl;
-		return ;
-	}
+	if (getaddrinfo(NULL, port.c_str(), &_hints, &_res))
+		throw GetAddrInfoFail();
 
-	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sockfd == -1) {
-		freeaddrinfo(res);
-		std::cout << "Error: socket() failed" << std::endl;
-		return ;
+	_sockfd = socket(_res->ai_family, _res->ai_socktype, _res->ai_protocol);
+	if (_sockfd == -1) {
+		freeaddrinfo(_res);
+		throw SocketFail();
 	}
 	
-	if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-		std::cout << "Error: bind() failed" << std::endl;
-		return ;
+	else if (bind(_sockfd, _res->ai_addr, _res->ai_addrlen) == -1) {
+		freeaddrinfo(_res);
+		throw BindFail();
 	}
 
-	if (listen(sockfd, 10) == -1) {
-		std::cout << "Error: listen() failed" << std::endl;
-		freeaddrinfo(res);
-		return ;
-	}
-	
-	initCommands();
-	std::vector<std::string>	args;
-	std::map<int, std::string>	fdAndMessage;
-	std::string					str;
-	int epoll_fd = epoll_create(1);
-	epoll_event dataEpoll, events[180];
-	dataEpoll.events = EPOLLIN;
-	dataEpoll.data.fd = sockfd;
-	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &dataEpoll);
-
-	while(1) {
-		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
-		if(nb_event != -1){
-			for(int i = 0; i < nb_event; i++) {
-				int fd_actif = events[i].data.fd;
-
-				if(fd_actif == sockfd) {
-					NewClient(fd_actif, dataEpoll, epoll_fd);
-				} else {
-					str = getBuffer(fd_actif);//GESTION MESSAGE + IDCHECK/PSS
-					args = splitBuffer(str); //split les arguments sans les checker
-					sendToCommand(args, fd_actif);
-				}
-			}
-		}
+	else if (listen(_sockfd, 10) == -1) {
+		freeaddrinfo(_res);
+		throw ListenFail();
 	}
 }
 
-std::string	Server::getBuffer(int fd_actif) {
+User*	Server::getUser(int fd)
+{
+	std::map<int, User*>::iterator it;
+
+	it = _fdToUser.find(fd);
+
+	if (it == _fdToUser.end())
+		return (NULL);
+
+	return (it->second);
+}
+
+bool Server::isBufferReady(std::string& buffer)
+{
+	size_t	pos = buffer.find("\r\n");
+
+	if (pos != std::string::npos && pos <= 510)
+		return (true);
+
+	return (false);
+}
+
+void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
+{
+	if (!user)
+		return ;
+
+	buffer.clear();
+	std::string message = ":";
+	message = message + SERVERNAME + " 417 " + user->getNickname() + " :Input line was too long\r\n";
+	send(fd, message.c_str(), message.length(), 0);
+}
+
+void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd)
+{
+	int fd_actif = event.data.fd;
+
+	if (fd_actif == _sockfd)
+	{
+		NewClient(fd_actif, dataEpoll, epoll_fd);
+		return ;
+	}
+
+	User	*user = getUser(fd_actif);
+	if (user == NULL)
+		return ;
+
+	updateUserBuffer(fd_actif, user);
+
+	user = getUser(fd_actif);
+	if (user == NULL)
+		return ;
+
+	std::string& userBuffer = user->getBuffer();
+	if (isBufferReady(userBuffer))
+	{
+		userBuffer.resize(userBuffer.size() - 2);
+		std::vector<std::string> args = splitBuffer(user);
+		sendToCommand(args, fd_actif);
+	} 
+	else if (userBuffer.size() > 510)
+		handleBufferTooLong(fd_actif, user, userBuffer);
+}
+
+void	Server::epollServer()
+{
+	int	epoll_fd = epoll_create(1);
+
+	epoll_event dataEpoll, events[180];
+	dataEpoll.events = EPOLLIN;
+	dataEpoll.data.fd = _sockfd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, _sockfd, &dataEpoll);
+
+	while (1)
+	{
+		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
+		if (nb_event == -1)
+			continue ;
+
+		for (int i = 0; i < nb_event; i++)
+			handle_event(events[i], dataEpoll, epoll_fd);
+	}
+}
+
+void	Server::updateUserBuffer(int fd_actif, User* user) {
 
 	int			rcvBytes;
 	char		buffer[BUFFER_SIZE];
 	std::string	buffString;
 
-	// Alors, actually, sans vouloir t'enfoncer:
-	/*
-	When reading messages from a stream, read the incoming data into a buffer.
-	Only parse and process a message once you encounter the \r\n at the end of it.
-	If you encounter an empty message, silently ignore it.
-	*/
-	// Il faut un buffer pour chaque fd,e t traiter le message uniquement une fois \r\n
-	rcvBytes = recv(fd_actif, buffer, sizeof(buffer) -2, 0);
-	std::cout << rcvBytes << std::endl;
-	buffer[rcvBytes - 1] = '\r'; //C'EST QUOI TA MERDE CA A PAS DE SENS : When reading messages from a stream, read the incoming data into a buffer. Only parse and process a message once you encounter the \r\n at the end of it. If you encounter an empty message, silently ignore it.
-	buffer[rcvBytes] = '\n';
+	if (!user)
+		return ;
+		
+	rcvBytes = recv(fd_actif, buffer, sizeof(buffer), 0);
+	if (rcvBytes == -1)
+		return ;
 
-	buffString = buffer;
-	return (buffString);
+	if (rcvBytes == 0)
+	{
+		delete user;
+		_fdToUser.erase(fd_actif);
+		return ;
+	}
+
+	std::string& userBuffer = user->getBuffer();
+	userBuffer += buffer;
 }
 
-std::vector<std::string> Server::splitBuffer(std::string str) {
+std::vector<std::string> Server::splitBuffer(User* user) {
 
 	std::vector<std::string>					cmd;
-	std::stringstream							ss(str);
+	std::stringstream							ss(user->getBuffer());
 	std::string									buffer;
 
 	while (getline(ss, buffer, ' '))
@@ -156,3 +207,24 @@ const char*	Server::UserNameAlreadyUsed::what() const throw() {
 
 const char* Server::ServerLimitChannel::what() const throw() {
 	return ("Can't create more channels"); }
+
+const char* Server::NullCommand::what() const throw() {
+	return ("Failed during commands initialisation"); }
+
+const char* Server::GetAddrInfoFail::what() const throw() {
+	return ("getaddrinfo() failed"); }
+
+const char* Server::SocketFail::what() const throw() {
+	return ("socket() failed"); }
+
+const char* Server::BindFail::what() const throw() {
+	return ("bind() failed"); }
+
+const char* Server::ListenFail::what() const throw() {
+	return ("listen() failed"); }
+
+const char* Server::PasswordRules::what() const throw() {
+	return ("Password must be at least 12 characters long"); }
+
+const char* Server::PortOutOfRange::what() const throw() {
+	return ("Port number must be between 1025 and 65535"); }
