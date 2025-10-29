@@ -40,84 +40,145 @@ void	Server::initCommands() {
 
 void	Server::initServer(std::string port) {
 
-	memset(&hints, 0, sizeof(hints));
+	memset(&_hints, 0, sizeof(_hints));
 
-	res = NULL;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
+	_res = NULL;
+	_hints.ai_family = AF_UNSPEC;
+	_hints.ai_socktype = SOCK_STREAM;
+	_hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo(NULL, port.c_str(), &hints, &res))
+	if (getaddrinfo(NULL, port.c_str(), &_hints, &_res))
 		throw GetAddrInfoFail();
 
-	sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sockfd == -1) {
-		freeaddrinfo(res);
+	_sockfd = socket(_res->ai_family, _res->ai_socktype, _res->ai_protocol);
+	if (_sockfd == -1) {
+		freeaddrinfo(_res);
 		throw SocketFail();
 	}
 	
-	else if (bind(sockfd, res->ai_addr, res->ai_addrlen) == -1) {
-		freeaddrinfo(res);
+	else if (bind(_sockfd, _res->ai_addr, _res->ai_addrlen) == -1) {
+		freeaddrinfo(_res);
 		throw BindFail();
 	}
 
-	else if (listen(sockfd, 10) == -1) {
-		freeaddrinfo(res);
+	else if (listen(_sockfd, 10) == -1) {
+		freeaddrinfo(_res);
 		throw ListenFail();
 	}
 }
 
+User*	Server::getUser(int fd)
+{
+	std::map<int, User*>::iterator it;
+
+	it = _fdToUser.find(fd);
+
+	if (it == _fdToUser.end())
+		return (NULL);
+
+	return (it->second);
+}
+
+bool Server::isBufferReady(std::string& buffer)
+{
+	size_t	pos = buffer.find("\r\n");
+
+	if (pos != std::string::npos && pos <= 510)
+		return (true);
+
+	return (false);
+}
+
+void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
+{
+	if (!user)
+		return ;
+
+	buffer.clear();
+	std::string message = ":";
+	message = message + SERVERNAME + " 417 " + user->getNickname() + " :Input line was too long\r\n";
+	send(fd, message.c_str(), message.length(), 0);
+}
+
+void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd)
+{
+	int fd_actif = event.data.fd;
+
+	if (fd_actif == _sockfd)
+	{
+		NewClient(fd_actif, dataEpoll, epoll_fd);
+		return ;
+	}
+
+	User	*user = getUser(fd_actif);
+	if (user == NULL)
+		return ;
+
+	updateUserBuffer(fd_actif, user);
+
+	user = getUser(fd_actif);
+	if (user == NULL)
+		return ;
+
+	std::string& userBuffer = user->getBuffer();
+	if (isBufferReady(userBuffer))
+	{
+		userBuffer.resize(userBuffer.size() - 2);
+		std::vector<std::string> args = splitBuffer(user);
+		sendToCommand(args, fd_actif);
+	} 
+	else if (userBuffer.size() > 510)
+		handleBufferTooLong(fd_actif, user, userBuffer);
+}
+
 void	Server::epollServer()
 {
-	std::vector<std::string>	args;
-	std::map<int, std::string>	fdAndMessage;
-	std::string					str;
-	int 						epoll_fd = epoll_create(1);
+	int	epoll_fd = epoll_create(1);
 
 	epoll_event dataEpoll, events[180];
 	dataEpoll.events = EPOLLIN;
-	dataEpoll.data.fd = sockfd;
-	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, sockfd, &dataEpoll);
+	dataEpoll.data.fd = _sockfd;
+	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, _sockfd, &dataEpoll);
 
 	while (1)
 	{
 		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
-		if (nb_event != -1)
-		{
-			for (int i = 0; i < nb_event; i++)
-			{
-				int fd_actif = events[i].data.fd;
+		if (nb_event == -1)
+			continue ;
 
-				if (fd_actif == sockfd)
-					NewClient(fd_actif, dataEpoll, epoll_fd);
-				else
-				{
-					str = getBuffer(fd_actif);//GESTION MESSAGE + IDCHECK/PSS
-					args = splitBuffer(str); //split les arguments sans les checker
-					sendToCommand(args, fd_actif);
-				}
-			}
-		}
+		for (int i = 0; i < nb_event; i++)
+			handle_event(events[i], dataEpoll, epoll_fd);
 	}
 }
 
-std::string	Server::getBuffer(int fd_actif) {
+void	Server::updateUserBuffer(int fd_actif, User* user) {
 
 	int			rcvBytes;
 	char		buffer[BUFFER_SIZE];
 	std::string	buffString;
 
+	if (!user)
+		return ;
+		
 	rcvBytes = recv(fd_actif, buffer, sizeof(buffer), 0);
-	std::cout << rcvBytes << std::endl;
+	if (rcvBytes == -1)
+		return ;
 
-	buffString = buffer;
-	return (buffString);
+	if (rcvBytes == 0)
+	{
+		delete user;
+		_fdToUser.erase(fd_actif);
+		return ;
+	}
+
+	std::string& userBuffer = user->getBuffer();
+	userBuffer += buffer;
 }
 
-std::vector<std::string> Server::splitBuffer(std::string str) {
+std::vector<std::string> Server::splitBuffer(User* user) {
 
 	std::vector<std::string>					cmd;
-	std::stringstream							ss(str);
+	std::stringstream							ss(user->getBuffer());
 	std::string									buffer;
 
 	while (getline(ss, buffer, ' '))

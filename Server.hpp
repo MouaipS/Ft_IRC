@@ -71,20 +71,23 @@ class Server
 			public: const char* what() const throw(); };
 
 	private:
-		const std::string				_port;
-		const std::string				_password;
-		std::vector<Channel>			_allChannels;
+		const std::string					_port;
+		const std::string					_password;
+		std::vector<Channel>				_allChannels;
 		std::map<int, User*>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
 
-		addrinfo			hints;
-		addrinfo			*res;
-		int					sockfd;
+		addrinfo			_hints;
+		addrinfo			*_res;
+		int					_sockfd;
 
 		// FUNCTIONS
 		void	sendToCommand(std::vector<std::string> cmd, int fd_origin);
-		void	sendToUser(int fd, std::string message, int flag);
 		void	NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd);
-		std::vector<std::string>	splitBuffer(std::string str);
-		std::string	getBuffer(int fd_actif);
+		std::vector<std::string>	splitBuffer(User* user);
+		void	updateUserBuffer(int fd_actif, User* user);
+		void	handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd);
+		User*	getUser(int fd);
+		bool isBufferReady(std::string& buffer);
+		void handleBufferTooLong(int fd, User *user, std::string& buffer);
 };

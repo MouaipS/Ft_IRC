@@ -14,6 +14,7 @@ class User {
 		std::string getUsername() const;
 		std::string getNickname() const;
 		bool 		getIsAuthed() const;
+		std::string&	getBuffer();
 
 		//Setter
 		void setNickname(std::string nickname);
@@ -29,4 +30,5 @@ class User {
 		bool _isAuthed;
 		std::string _username;
 		std::string _nickname;
+		std::string _buffer;
 };
