@@ -5,7 +5,10 @@
 Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
 Server::~Server() {
-	
+
+	std::map<std::string, ICommand*>::iterator it = _commands.begin();
+	for (;it != _commands.end(); ++it)
+		delete it->second;
 }
 
 // F U N C T I O N S
