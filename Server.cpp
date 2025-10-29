@@ -5,10 +5,11 @@
 Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
 Server::~Server() {
-
+	/*
 	std::map<std::string, ICommand*>::iterator it = _commands.begin();
 	for (;it != _commands.end(); ++it)
 		delete it->second;
+	*/
 }
 
 // F U N C T I O N S
@@ -130,6 +131,9 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 	{
 		userBuffer.resize(userBuffer.size() - 2);
 		std::vector<std::string> args = splitBuffer(user);
+		for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); ++it) {
+        	std::cout << *it << std::endl;
+    	}
 		sendToCommand(args, fd_actif);
 		userBuffer.clear();
 	} 
