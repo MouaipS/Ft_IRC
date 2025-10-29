@@ -1,6 +1,10 @@
 #pragma once
 #include "ICommand.hpp"
 
+#define ERR_NEEDMOREPARAMS "461"
+#define ERR_ALREADYREGISTERED "462"
+#define ERR_PASSWDMISMATCH "464"
+
 class CmdPass : public ICommand {
 public:
     void execCmd(

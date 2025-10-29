@@ -22,5 +22,7 @@ class ICommand {
 
 		bool	isUserValidAuth(User& user, bool pass, bool nick, bool username);
 		void	sendToUser(int fd, std::string message, int flag);
-
+	
+	protected:
+		const std::string _serverName;
 };
