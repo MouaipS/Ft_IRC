@@ -22,7 +22,6 @@ void CmdUser::execCmd(
 ) {
     (void) allChannels;
     (void) password;
-            std::cout << cmd[1] << std::endl;
     if(isAvailable(cmd[1], fdToUser[fd_origin], fdToUser) == false) {  
         //Si Username not available ou pas isalphanum : 461 ERR_NEEDMOREPARAMS "<client> <command> :Not enough parameters" 
         std::string message = ":";
