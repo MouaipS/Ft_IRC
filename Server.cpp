@@ -4,7 +4,9 @@
 
 Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
-Server::~Server() {}
+Server::~Server() {
+	
+}
 
 // F U N C T I O N S
 
@@ -126,6 +128,7 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		userBuffer.resize(userBuffer.size() - 2);
 		std::vector<std::string> args = splitBuffer(user);
 		sendToCommand(args, fd_actif);
+		userBuffer.clear();
 	} 
 	else if (userBuffer.size() > 510)
 		handleBufferTooLong(fd_actif, user, userBuffer);

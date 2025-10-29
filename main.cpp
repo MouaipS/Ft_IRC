@@ -18,6 +18,11 @@ int main (int argc, char **argv) {
 		ircSERV.initServer(argv[1]);
 		ircSERV.initCommands();
 	}
-	catch (std::exception& e) {std::cout << e.what() << std::endl; }
+	catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
+
 	ircSERV.epollServer();
+	return (0);
 }
