@@ -10,6 +10,5 @@ public:
         const std::string& password,
         std::vector<Channel>& allChannels,
         std::map<int, User*>& fdToUser
-    );
-    
+    );    
 };
