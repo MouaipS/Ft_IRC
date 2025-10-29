@@ -11,4 +11,5 @@ public:
         std::vector<Channel>& allChannels,
         std::map<int, User*>& fdToUser
     );
+    
 };
