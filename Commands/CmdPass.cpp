@@ -1,12 +1,5 @@
 #include "CmdPass.hpp"
 
-static std::string getFormatedMessage(std::string servName, std::string code, std::string nick, std::string mess)
-{
-	std::string message = ":";
-	message += servName + " " + code + " " + nick + " PASS:" + mess + "\r\n";
-	return (message);
-}
-
 static bool	verifyPassword(const std::string& value, const std::string& ref)
 {
 	return (value == ref);
@@ -24,21 +17,23 @@ void CmdPass::execCmd(
 
 	if (cmd.size() < 2)
 	{
-		sendToUser(fd, ":" + name));
+		sendToUser(fd_origin, user->getNickname() + " PASS:Not enough parameters", 0);
 		return ;
 	}
 
 	if (user->getIsAuthed())
 	{
-		handle_already_registered(fd_origin, fdToUser[fd_origin], name);
+		sendToUser(fd_origin, user->getNickname() + " PASS:You may not reregister", 0);
 		return ;
 	}
 
 	if (!verifyPassword(cmd[1], password))
 	{
-		handle_
+		sendToUser(fd_origin, user->getNickname() + " PASS:Password incorrect", 0);
+		return ;
 	}
 	
+	user->setIsAuthed(true);
 
     // TODO: Implémenter la commande Pass
 	(void) fd_origin;

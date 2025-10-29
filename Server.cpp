@@ -121,7 +121,6 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		return ;
 
 	updateUserBuffer(fd_actif, user);
-
 	user = getUser(fd_actif);
 	if (user == NULL)
 		return ;

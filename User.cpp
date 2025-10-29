@@ -25,8 +25,8 @@ bool User::getIsAuthed() const {
 	return(_isAuthed);
 }
 
-void User::setIsAuthed() {
-	_isAuthed = true;
+void User::setIsAuthed(bool value) {
+	_isAuthed = value;
 }
 
 void User::setNickname(std::string nickname) {
