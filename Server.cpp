@@ -13,8 +13,19 @@ Server::~Server() {
 
 // F U N C T I O N S
 
-void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
-
+/**
+ * @brief Accepts a new client connection and registers it with epoll.
+ *
+ * This function is triggered when the main server socket (`_sockfd`)
+ * receives a new connection request. It accepts the client, makes its
+ * file descriptor non-blocking, and adds it to the epoll monitoring set.
+ * A new `User` instance is created and stored in the `_fdToUser` map.
+ *
+ * @param fd_actif File descriptor of the active socket (the server socket).
+ * @param dataEpoll Structure used to register new epoll events.
+ * @param epoll_fd File descriptor of the epoll instance.
+ */
+void Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 	int client_fd = accept(fd_actif, NULL, NULL);
 
 	if (client_fd == -1) {
@@ -30,6 +41,16 @@ void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 	_fdToUser.insert(std::make_pair(client_fd, new User()));
 }
 
+/**
+ * @brief Initializes the command list for the server.
+ *
+ * Creates and registers all supported IRC commands (KICK, INVITE, TOPIC, etc.)
+ * Each command is stored as a pair of command name and its corresponding
+ * `ICommand`-derived object in the `_commands` map.
+ *
+ * @note Memory for command objects is allocated dynamically and freed
+ * in the destructor.
+ */
 void	Server::initCommands() {
 	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
 	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
@@ -42,6 +63,18 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
 }
 
+/**
+ * @brief Sets up the main server socket and starts listening for connections.
+ *
+ * This function configures address information, creates a socket, binds it
+ * to the given port, and starts listening for incoming client connections.
+ *
+ * @param port The port number (as string) on which the server will listen.
+ * @throw GetAddrInfoFail If `getaddrinfo()` fails.
+ * @throw SocketFail If socket creation fails.
+ * @throw BindFail If the socket binding fails.
+ * @throw ListenFail If the `listen()` system call fails.
+ */
 void	Server::initServer(std::string port) {
 
 	memset(&_hints, 0, sizeof(_hints));
@@ -83,6 +116,16 @@ User*	Server::getUser(int fd)
 	return (it->second);
 }
 
+/**
+ * @brief Checks if the user's input buffer contains a complete command.
+ *
+ * Determines if the buffer includes the IRC message delimiter `\r\n`
+ * and ensures the total command length does not exceed 510 characters.
+ *
+ * @param buffer Reference to the user's input buffer.
+ * @return true if a complete and valid command is ready to process.
+ * @return false otherwise.
+ */
 bool Server::isBufferReady(std::string& buffer)
 {
 	size_t	pos = buffer.find("\r\n");
@@ -93,6 +136,16 @@ bool Server::isBufferReady(std::string& buffer)
 	return (false);
 }
 
+/**
+ * @brief Handles situations where the client's input exceeds the allowed length.
+ *
+ * When a user sends a message longer than the IRC protocol limit (510 chars),
+ * this function clears their buffer and sends them an error message.
+ *
+ * @param fd File descriptor of the client socket.
+ * @param user Pointer to the associated `User` object.
+ * @param buffer Reference to the user's buffer (will be cleared).
+ */
 void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
 {
 	if (!user)
@@ -104,6 +157,18 @@ void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
 	send(fd, message.c_str(), message.length(), 0);
 }
 
+/**
+ * @brief Handles an epoll event (either a new client or client activity).
+ *
+ * If the event corresponds to the server socket, it accepts a new client.
+ * Otherwise, it reads data from the existing client's socket, updates
+ * their buffer, checks for complete commands, and dispatches them to the
+ * corresponding command handler.
+ *
+ * @param event The triggered epoll event (either new connection or data ready).
+ * @param dataEpoll The epoll event template for adding new clients.
+ * @param epoll_fd The epoll instance file descriptor.
+ */
 void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd)
 {
 	int fd_actif = event.data.fd;
@@ -135,6 +200,15 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		handleBufferTooLong(fd_actif, user, userBuffer);
 }
 
+/**
+ * @brief Main event loop of the server using epoll.
+ *
+ * Continuously waits for network events using `epoll_wait()` and
+ * dispatches them to `handle_event()` for processing.
+ * This function effectively keeps the server running.
+ *
+ * @note This loop runs indefinitely until the process is stopped.
+ */
 void	Server::epollServer()
 {
 	int	epoll_fd = epoll_create(1);
@@ -155,6 +229,16 @@ void	Server::epollServer()
 	}
 }
 
+/**
+ * @brief Reads incoming data from a client socket and updates their buffer.
+ *
+ * If data is received, it is appended to the user’s input buffer.
+ * If the client disconnects (`recv` returns 0), their `User` object
+ * is deleted and removed from `_fdToUser`.
+ *
+ * @param fd_actif The client’s file descriptor.
+ * @param user Pointer to the `User` object associated with the client.
+ */
 void	Server::updateUserBuffer(int fd_actif, User* user) {
 
 	int			rcvBytes;
@@ -191,6 +275,16 @@ std::vector<std::string> Server::splitBuffer(User* user) {
 	return (cmd);
 }
 
+/**
+ * @brief Executes a command received from a client.
+ *
+ * Finds the corresponding `ICommand` object from the `_commands` map
+ * and executes it via its `execCmd()` method.
+ * If the command is unknown, sends an error message back to the client.
+ *
+ * @param cmd Vector of parsed command arguments.
+ * @param fd_origin File descriptor of the client that issued the command.
+ */
 void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 {
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
