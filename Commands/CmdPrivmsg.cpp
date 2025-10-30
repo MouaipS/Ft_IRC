@@ -1,5 +1,7 @@
 #include "CmdPrivmsg.hpp"
 
+CmdPrivmsg::CmdPrivmsg(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdPrivmsg::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,

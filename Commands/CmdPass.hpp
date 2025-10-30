@@ -7,6 +7,7 @@
 
 class CmdPass : public ICommand {
 public:
+	CmdPass(std::string serverName);
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

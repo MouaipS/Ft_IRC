@@ -1,5 +1,9 @@
 #include "ICommand.hpp"
 
+ICommand::ICommand(std::string serverName) : _serverName(serverName) {};
+
+ICommand::~ICommand() {};
+
 const char* ICommand::UserNotFoundException::what() const throw()
 {
 	return ("User not found in server list.");

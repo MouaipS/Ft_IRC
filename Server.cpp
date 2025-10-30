@@ -5,11 +5,10 @@
 Server::Server(std::string port, std::string password): _port(port), _password(password) {}
 
 Server::~Server() {
-	/*
+	
 	std::map<std::string, ICommand*>::iterator it = _commands.begin();
 	for (;it != _commands.end(); ++it)
 		delete it->second;
-	*/
 }
 
 // F U N C T I O N S
@@ -32,16 +31,15 @@ void	Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
 }
 
 void	Server::initCommands() {
-
-	_commands.insert(std::make_pair("KICK", new CmdKick()));
-	_commands.insert(std::make_pair("INVITE", new CmdInvite()));
-	_commands.insert(std::make_pair("TOPIC", new CmdTopic()));
-	_commands.insert(std::make_pair("MODE", new CmdMode()));
-	_commands.insert(std::make_pair("JOIN", new CmdJoin()));
-	_commands.insert(std::make_pair("NICK", new CmdNick()));
-	_commands.insert(std::make_pair("PASS", new CmdPass()));
-	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg()));
-	_commands.insert(std::make_pair("USER", new CmdUser()));
+	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
+	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
+	_commands.insert(std::make_pair("TOPIC", new CmdTopic(SERVERNAME)));
+	_commands.insert(std::make_pair("MODE", new CmdMode(SERVERNAME)));
+	_commands.insert(std::make_pair("JOIN", new CmdJoin(SERVERNAME)));
+	_commands.insert(std::make_pair("NICK", new CmdNick(SERVERNAME)));
+	_commands.insert(std::make_pair("PASS", new CmdPass(SERVERNAME)));
+	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg(SERVERNAME)));
+	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
 }
 
 void	Server::initServer(std::string port) {
@@ -130,9 +128,6 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 	{
 		userBuffer.resize(userBuffer.size() - 2);
 		std::vector<std::string> args = splitBuffer(user);
-		for (std::vector<std::string>::iterator it = args.begin(); it != args.end(); ++it) {
-        	std::cout << *it << std::endl;
-    	}
 		sendToCommand(args, fd_actif);
 		userBuffer.clear();
 	} 

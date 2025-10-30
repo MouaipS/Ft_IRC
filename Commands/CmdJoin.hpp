@@ -3,6 +3,7 @@
 
 class CmdJoin : public ICommand {
 public:
+	CmdJoin(std::string serverName);
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

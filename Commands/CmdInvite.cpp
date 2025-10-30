@@ -1,5 +1,7 @@
 #include "CmdInvite.hpp"
 
+CmdInvite::CmdInvite(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdInvite::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,

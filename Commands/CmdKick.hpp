@@ -3,6 +3,7 @@
 
 class CmdKick : public ICommand {
 public:
+	CmdKick(std::string serverName);
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

@@ -1,5 +1,8 @@
 #include "CmdMode.hpp"
 
+
+CmdMode::CmdMode(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdMode::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,

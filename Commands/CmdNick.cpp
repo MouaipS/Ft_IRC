@@ -1,5 +1,7 @@
 #include "CmdNick.hpp"
 
+CmdNick::CmdNick(std::string serverName) : ICommand::ICommand(serverName) {};
+
 static bool isAvailable(std::string name, User *user, std::map<int, User*>& fdToUser) {
     if(user->isNicknameValid(name) == true) {
         std::map<int, User*>::iterator it;
