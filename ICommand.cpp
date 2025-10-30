@@ -25,3 +25,9 @@ void	ICommand::sendToUser(int fd, std::string message, int flag)
 	message = ":" + _serverName + " " + message + "\r\n";
 	send(fd, message.c_str(), message.length(), flag);
 }
+
+void	ICommand::sendToUser2(int fd, std::string message, std::string message2, int flag)
+{
+	message = ":" + message + _serverName + message2 + "\r\n";
+	send(fd, message.c_str(), message.length(), flag);
+}

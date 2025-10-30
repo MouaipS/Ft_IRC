@@ -14,7 +14,7 @@ class ICommand {
 					int							fd,
 					std::vector<std::string>&	cmd,
 					const std::string&			password,
-					std::vector<Channel>&		allChannels,
+					std::vector<Channel*>&		allChannels,
 					std::map<int, User*>&		fdToUser
 		) = 0;
 
@@ -24,6 +24,7 @@ class ICommand {
 
 		bool	isUserValidAuth(User& user, bool pass, bool nick, bool username);
 		void	sendToUser(int fd, std::string message, int flag);
+		void	sendToUser2(int fd, std::string message, std::string message2, int flag);
 	
 	protected:
 		const std::string _serverName;

@@ -69,11 +69,13 @@ class Server
 			public: const char* what() const throw(); };
 		class PortOutOfRange: public std::exception {
 			public: const char* what() const throw(); };
+		class InitCommandFail: public std::exception {
+			public: const char* what() const throw(); };
 
 	private:
 		const std::string					_port;
 		const std::string					_password;
-		std::vector<Channel>				_allChannels;
+		std::vector<Channel*>				_allChannels;
 		std::map<int, User*>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
 

@@ -12,7 +12,7 @@ Channel::Channel(std::string name) : _name(name)
 
 Channel::~Channel()
 {
-	std::cout << "Channel " << _name << "has been destroyed." << std::endl;
+	std::cout << "Channel " << _name << " has been destroyed." << std::endl;
 }
 
 // ------------- GET  ------------- //
@@ -102,6 +102,22 @@ void Channel::setUserLimit(size_t value)
 void Channel::setIsLimit(bool value)
 {
     _isUserLimit = value;
+}
+
+void	Channel::setNewUser(User* user) {
+
+	_users.push_back(user);
+}
+
+void	Channel::deleteUser(User* user) {
+
+	std::vector<User*>::iterator	it = _users.begin();
+
+	for (; it != _users.end(); it++) {
+
+		if (user->getUsername() == (*it)->getUsername())
+			_users.erase(it);
+	}
 }
 
 

@@ -52,15 +52,38 @@ void Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
  * in the destructor.
  */
 void	Server::initCommands() {
+
 	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
+	std::cout << _commands.begin()->first << std::endl;
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
-	_commands.insert(std::make_pair("TOPIC", new CmdTopic(SERVERNAME)));
+	std::cout << _commands.begin()->first << std::endl;
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("AAA", new CmdTopic(SERVERNAME)));
+	std::cout << _commands.begin()->first << std::endl;
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("MODE", new CmdMode(SERVERNAME)));
+	std::cout << _commands.begin()->first << std::endl;
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("JOIN", new CmdJoin(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("NICK", new CmdNick(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("PASS", new CmdPass(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 }
 
 /**
@@ -326,3 +349,6 @@ const char* Server::PasswordRules::what() const throw() {
 
 const char* Server::PortOutOfRange::what() const throw() {
 	return ("Port number must be between 1025 and 65535"); }
+
+const char* Server::InitCommandFail::what() const throw() {
+	return ("Init command failed"); }

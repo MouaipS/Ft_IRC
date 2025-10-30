@@ -31,6 +31,8 @@ class Channel {
 		void	setIsKeyProtected(bool value);
 		void	setIsLimit(bool value);
 		void	setUserLimit(size_t value);
+		void	setNewUser(User* user);
+		void	deleteUser(User* user);
 
 		// Utils
 

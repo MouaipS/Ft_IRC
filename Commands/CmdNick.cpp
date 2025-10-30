@@ -16,7 +16,7 @@ static bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*
 
 void CmdNick::execCmd(
     int fd_origin, std::vector<std::string>& cmd, const std::string& password,
-    std::vector<Channel>& allChannels,std::map<int, User*>& fdToUser)
+    std::vector<Channel*>& allChannels,std::map<int, User*>& fdToUser)
 {
     (void) allChannels;
     (void) password;
