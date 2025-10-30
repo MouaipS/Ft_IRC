@@ -13,8 +13,7 @@ static bool isAvailable(std::string name, User *user, std::map<int, User*>& fdTo
 }
 
 void CmdUser::execCmd(
-    int fd_origin, std::vector<std::string>& cmd,
-    const std::string& servername, const std::string& password,
+    int fd_origin, std::vector<std::string>& cmd, const std::string& password,
     std::vector<Channel>& allChannels, std::map<int, User*>& fdToUser)
 {
     (void) allChannels;

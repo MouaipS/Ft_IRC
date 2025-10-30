@@ -8,7 +8,6 @@ static bool	verifyPassword(const std::string& value, const std::string& ref)
 void CmdPass::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,
-    const std::string& name,
     const std::string& password,
     std::vector<Channel>& allChannels,
     std::map<int, User*>& fdToUser)
@@ -38,7 +37,6 @@ void CmdPass::execCmd(
     // TODO: Implémenter la commande Pass
 	(void) fd_origin;
 	(void) cmd;
-	(void) name;
 	(void) password;
 	(void) allChannels;
 	(void) fdToUser;	

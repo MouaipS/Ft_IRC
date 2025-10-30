@@ -203,7 +203,7 @@ void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 	if (it == _commands.end())
 		send(fd_origin, "Unknown command\r\n", 18, 0); // Format unknown command
 	else
-		it->second->execCmd(fd_origin, cmd, SERVERNAME, _password, _allChannels, _fdToUser);
+		it->second->execCmd(fd_origin, cmd, _password, _allChannels, _fdToUser);
 }
 
 // E X C E P T I O N S
