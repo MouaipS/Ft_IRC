@@ -19,7 +19,7 @@ class User {
 		//Setter
 		void setNickname(std::string nickname);
 		void setUsername(std::string Username);
-		void setIsAuthed();
+		void setIsAuthed(bool value);
 
 		// Verification
 		bool isUsernameValid(std::string value);

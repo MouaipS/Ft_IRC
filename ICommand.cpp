@@ -18,5 +18,6 @@ bool	ICommand::isUserValidAuth(User& user, bool pass, bool nick, bool username)
 
 void	ICommand::sendToUser(int fd, std::string message, int flag)
 {
+	message = ":" + _serverName + " " + message + "\r\n";
 	send(fd, message.c_str(), message.length(), flag);
 }

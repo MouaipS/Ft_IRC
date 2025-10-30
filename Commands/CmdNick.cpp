@@ -1,6 +1,6 @@
 #include "CmdNick.hpp"
 
-bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*>& fdToUser) {
+static bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*>& fdToUser) {
     if(user->isNicknameValid(CorrectNick) == true) {
         std::map<int, User*>::iterator it;
         for(it=fdToUser.begin(); it != fdToUser.end(); it++){
