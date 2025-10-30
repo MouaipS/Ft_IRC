@@ -7,6 +7,9 @@
 class ICommand {
 
 	public:
+		ICommand(std::string serverName);
+		virtual ~ICommand();
+		
 		virtual void execCmd (	
 					int							fd,
 					std::vector<std::string>&	cmd,

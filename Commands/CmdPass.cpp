@@ -1,5 +1,7 @@
 #include "CmdPass.hpp"
 
+CmdPass::CmdPass(std::string serverName) : ICommand::ICommand(serverName) {};
+
 static bool	verifyPassword(const std::string& value, const std::string& ref)
 {
 	return (value == ref);

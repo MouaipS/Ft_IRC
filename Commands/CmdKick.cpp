@@ -1,5 +1,7 @@
 #include "CmdKick.hpp"
 
+CmdKick::CmdKick(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdKick::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,

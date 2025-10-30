@@ -1,5 +1,7 @@
 #include "CmdTopic.hpp"
 
+CmdTopic::CmdTopic(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdTopic::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,

@@ -3,6 +3,7 @@
 
 class CmdMode : public ICommand {
 public:
+	CmdMode(std::string serverName);
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

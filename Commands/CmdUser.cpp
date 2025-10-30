@@ -1,4 +1,7 @@
 #include "CmdUser.hpp"
+
+CmdUser::CmdUser(std::string serverName) : ICommand::ICommand(serverName) {};
+
 static bool isAvailable(std::string name, User *user, std::map<int, User*>& fdToUser) {
     if(user->isUsernameValid(name) == true) {
         std::map<int, User*>::iterator it;

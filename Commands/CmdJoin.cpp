@@ -1,5 +1,7 @@
 #include "CmdJoin.hpp"
 
+CmdJoin::CmdJoin(std::string serverName) : ICommand::ICommand(serverName) {};
+
 void CmdJoin::execCmd(
     int fd_origin,
     std::vector<std::string>& cmd,
