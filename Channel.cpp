@@ -191,8 +191,8 @@ void Channel::addUserToChannel(User& user)
  */
 void Channel::removeUserFromChannel(User& user)
 {
-	size_t user_index;
-	size_t operator_index;
+	int user_index;
+	int operator_index;
 
 	user_index = findUser(user);
 	operator_index = findOperator(user);
@@ -238,7 +238,7 @@ void Channel::promoteUser(User &user)
  */
 void Channel::demoteUser(User &user)
 {
-	size_t operator_index;
+	int operator_index;
 
 	if (findUser(user) < 0)
 		throw (UserNotFoundInChannelException());
