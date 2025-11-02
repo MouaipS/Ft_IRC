@@ -37,6 +37,7 @@ class Channel {
 		// Utils
 
 		int		findUser(User& user);
+		User 	*findUser(std::string name);
 		int		findOperator(User& user);
 		void	addUserToChannel(User& user);
 		void	removeUserFromChannel(User& user);

@@ -142,6 +142,25 @@ int Channel::findUser(User& user)
 }
 
 /**
+ * @brief Searches for a user in the channel's user list.
+ * 
+ * @param name The username to the user to search for.
+ * @return User*
+ * - ptr on the user found
+ * - NULL if the user is not present in the channel
+ */
+User *Channel::findUser(std::string name) {
+	std::vector<User*>::iterator it = _users.begin();
+	for(;it != _users.end(); it++){
+		if((*it)->getUsername() == name)
+			return((*it));
+	}
+	return(NULL);
+}
+
+
+
+/**
  * @brief Searches for a user in the channel's operator list.
  * 
  * @param user Reference to the user to search for.
