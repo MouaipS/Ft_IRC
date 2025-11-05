@@ -23,6 +23,7 @@ void CmdUser::execCmd(
     (void) password;
     User *user = fdToUser[fd_origin];
 
+	std::cout << "In CmdUser::execCmd" << std::endl;
     if (cmd.size() < 2) {
         sendToUser(fd_origin, "431 * :No username given", 0);
         return;

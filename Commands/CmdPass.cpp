@@ -15,7 +15,7 @@ void CmdPass::execCmd(
     std::map<int, User*>& fdToUser)
 {
 	User* user = fdToUser[fd_origin];
-
+	
 	if (cmd.size() < 2)
 	{
 		sendToUser(fd_origin, user->getNickname() + " PASS:Not enough parameters", 0);
