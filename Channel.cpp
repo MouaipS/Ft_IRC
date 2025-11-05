@@ -235,15 +235,15 @@ void Channel::removeUserFromChannel(User& user)
  * Adds the user to the `_operators` list if they are part of the channel
  * and not already an operator.
  */
-void Channel::promoteUser(User &user)
+void Channel::promoteUser(User *user)
 {
-	if (findUser(user) < 0)
+	if (findUser(*user) < 0)
 		throw (UserNotFoundInChannelException());
 
-	if (findOperator(user) >= 0)
+	if (findOperator(*user) >= 0)
 		throw (UserAlreadyOperatorException());
 
-	_operators.push_back(&user);
+	_operators.push_back(user);
 }
 
 /**

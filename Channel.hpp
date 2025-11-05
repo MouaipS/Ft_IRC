@@ -32,6 +32,7 @@ class Channel {
 		void	setIsLimit(bool value);
 		void	setUserLimit(size_t value);
 		void	setNewUser(User* user);
+		void	setNewOperator(User *user);
 		void	deleteUser(User* user);
 
 		// Utils
@@ -41,7 +42,7 @@ class Channel {
 		int		findOperator(User& user);
 		void	addUserToChannel(User& user);
 		void	removeUserFromChannel(User& user);
-		void	promoteUser(User& user);
+		void	promoteUser(User *user);
 		void	demoteUser(User& user);
 		
 		class ChannelUserLimitExceededException: public std::exception {
