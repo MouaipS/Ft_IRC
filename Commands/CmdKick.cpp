@@ -4,7 +4,9 @@ CmdKick::CmdKick(std::string serverName) : ICommand::ICommand(serverName) {};
 
 
 /**
+ * @brief find the target/check the channel/find OP
  * @return flag (1/2/3)
+ * - 0 : Empty channel
  * - 1 : Find user in channel 
  * - 2 : Find channel but no user
  * - 3 : Can't find the channel
@@ -15,6 +17,7 @@ int findTarget(std::string target, std::string channel, std::vector<Channel*>& a
     for(; it != allChannels.end(); it++){
         if((*it)->getName() == channel)
         {
+            if((*it)->getUsers().empty()) return(0);
             userTarget = (*it)->findUser(target);
             if(userTarget == NULL)
                 return(2);
@@ -32,16 +35,15 @@ void CmdKick::execCmd(
     const std::string& password,
     std::vector<Channel*>& allChannels,
     std::map<int, User*>& fdToUser
-) { // 451✅ 461✅ 403 441 481/482 353
+) {
     std::string reason;
     User *user = fdToUser[fd_origin];
-    //check valid user/op
+
     if(!isUserValidAuth(*user, 1,1,1)){
         sendToUser(fd_origin, "451 " + user->getUsername() + ":You have not registered", 0);
         return;
     }
 
-    //check reason and param
     if(cmd.size() == 4) {
         reason = cmd[3];
     } else if(cmd.size() == 3) {
@@ -53,44 +55,21 @@ void CmdKick::execCmd(
     }
 
     User *target;
-    //check target
     int checkTarget = findTarget(cmd[1], cmd[2], allChannels, target);
-    if(checkTarget == 3){
+    if(checkTarget == 0) {
+        sendToUser(fd_origin, "353 " + user->getUsername() + " " +cmd[2] + "Empty channel", 0);    
+    }else if(checkTarget == 3){
         sendToUser(fd_origin, "403 " + user->getUsername() + " " +cmd[2] + " :No such channel", 0);    
     } else if(checkTarget == 2)
         sendToUser(fd_origin, "441 " + cmd[1] + " " + user->getUsername() + ":They aren't on that channel", 0);
-
-
-    User *userTmp;
-    int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, userTmp);
-    if(checkOp == 2)
-        sendToUser(fd_origin, "442 " + user->getUsername() + " You're not on that channel", 0);
-    else if(checkOp != 4)
-        sendToUser(fd_origin, "482 " + user->getUsername() + " You're not channel operator", 0);
-    else 
-        sendToUser(fd_origin, "KICK " + cmd[2] + target->getNickname() + reason, 0);
+    else{     
+        User *userTmp;
+        int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, userTmp);
+        if(checkOp == 2)
+            sendToUser(fd_origin, "442 " + user->getUsername() + " You're not on that channel", 0);
+        else if(checkOp != 4)
+            sendToUser(fd_origin, "482 " + user->getUsername() + " You're not channel operator", 0);
+        else 
+            sendToUser(fd_origin, "KICK " + cmd[2] + target->getNickname() + reason, 0);
+    }    
 }
-
-////Erreur: "You are not IRC operator"
-    //::server 481 <nick> :You are not IRC operator
-    //
-    ////Erreur: "No such channel"
-    //::server 403 <nick> <channel> :No such channel ->Channel n'existe pas
-    //
-    ////Erreur: "They aren't on that channel" ERR_USERNOTINCHANNEL
-    //::server 441 <nick> <user> :They aren't on that channel ->Pas de cible
-
-    //Erreur:"You're not on that channel" 
-    //:server 442 "ERR_NOTONCHANNEL" ->user pas dans le channel
-    //
-    ////Erreur: "You're not channel operator" ERR_CHANOPRIVSNEEDED
-    //::server 482 <nick> <channel> :You're not channel operator -> user pas op
-    //
-    ////Succès: Expulsion avec message
-    //::server KICK <channel> <user> :<message>
-    //>
-    //
-    ////Erreur: "Channel is empty"
-    //::server 353 <nick> <channel> :Channel is empty
-
-
