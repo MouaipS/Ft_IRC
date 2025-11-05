@@ -22,6 +22,7 @@ void CmdNick::execCmd(
     (void) password;
     User *user = fdToUser[fd_origin];
 
+	std::cout << "In CmdNick::execCmd" << std::endl;
     if(cmd.size() < 2){
         sendToUser(fd_origin, "431 * :No nickname given", 0);
         return;

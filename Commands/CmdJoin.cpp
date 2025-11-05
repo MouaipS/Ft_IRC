@@ -21,14 +21,14 @@ void CmdJoin::execCmd(
 {
 
 	(void) password;
-	//TODO verifier que user est authentifier + que cmd[1] existe
+	//TODO verifier que user est authentifié + que cmd[1] existe
 	std::vector<Channel*>::iterator	it = allChannels.begin();
 	User*							user = fdToUser[fd_origin];
 
 	for (; it != allChannels.end(); it++) {
 
 		if ((*it)->getName() == cmd[1])
-		{
+			{
 			if (alreadyOnChannel(user, (*it)->getUsers()))
 			{
 				std::cout << "deja la" << std::endl;
@@ -37,15 +37,20 @@ void CmdJoin::execCmd(
 			else
 			{
 				std::cout << "channel existe deja" << std::endl;
-				sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() 					+ "@", "JOIN " + cmd[1] + " * :realname", 0); 
+				sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
+							" JOIN " + cmd[1], 0);
 				allChannels[0]->setNewUser(user);
 				return ;
 			}
 		}
 	}
 	std::cout << "creer channel" << std::endl;
-	sendToUser2(fd_origin, user->getNickname() + "!" 
-	+ user->getUsername() + "@", "JOIN " + cmd[1] + " * :realname", 0); 
+	sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
+				" JOIN " + cmd[1], 0);
+	// sendToUser(fd_origin, "332 " + user->getNickname() + " " + cmd[1] + " :le topic", 0);
+	// sendToUser(fd_origin, "353 " + user->getNickname() + " = " + cmd[1] + " :@" 
+				// + user->getNickname(), 0);
+	// sendToUser(fd_origin, "366 " + user->getNickname() + " " + cmd[1] + " :End of /NAMES list.", 0);
 	allChannels.push_back(new Channel(cmd[1]));
 	allChannels[0]->setNewUser(user);
 }

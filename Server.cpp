@@ -53,35 +53,31 @@ void Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
  */
 void	Server::initCommands() {
 
-	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
-	std::cout << _commands.begin()->first << std::endl;
+	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
-	std::cout << _commands.begin()->first << std::endl;
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("AAA", new CmdTopic(SERVERNAME)));
-	std::cout << _commands.begin()->first << std::endl;
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("MODE", new CmdMode(SERVERNAME)));
-	std::cout << _commands.begin()->first << std::endl;
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("JOIN", new CmdJoin(SERVERNAME)));
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("NICK", new CmdNick(SERVERNAME)));
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("PASS", new CmdPass(SERVERNAME)));
+	_commands.insert(std::make_pair("TOPIC", new CmdTopic(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
+	_commands.insert(std::make_pair("PASS", new CmdPass(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("NICK", new CmdNick(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("MODE", new CmdMode(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("JOIN", new CmdJoin(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 }
@@ -214,7 +210,8 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 	std::string& userBuffer = user->getBuffer();
 	if (isBufferReady(userBuffer))
 	{
-		userBuffer.resize(userBuffer.size() - 2);
+		// userBuffer.resize(userBuffer.size() - 2);
+		userBuffer = userBuffer.substr(0, userBuffer.length() - 2);
 		std::vector<std::string> args = splitBuffer(user);
 		sendToCommand(args, fd_actif);
 		userBuffer.clear();
