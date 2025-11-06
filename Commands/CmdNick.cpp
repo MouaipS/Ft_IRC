@@ -36,6 +36,7 @@ void CmdNick::execCmd(
     }
     else if (isUserValidAuth(*user, 1, 0, 1)) {
         user->setNickname(cmd[1]);
+		user->setFd(fd_origin);
         sendToUser(fd_origin, "001 " + CorrectNick + " :Welcome to the IRC Network", 0);
     }
     else {user->setNickname(cmd[1]);}

@@ -21,6 +21,11 @@ std::string& User::getBuffer()
 	return (_buffer);
 }
 
+int	User::getFd() const {
+
+	return (_fd);
+}
+
 bool User::getIsAuthed() const {
 	return(_isAuthed);
 }
@@ -35,6 +40,11 @@ void User::setNickname(std::string nickname) {
 
 void User::setUsername(std::string username) {
 	_username = username;
+}
+
+void User::setFd(int fd) {
+
+	_fd = fd;
 }
 
 bool isAlphaNum(std::string name) {

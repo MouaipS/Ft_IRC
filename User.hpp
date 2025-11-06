@@ -11,12 +11,14 @@ class User {
 		~User();
 
 		//Geter
+		int			getFd() const;
 		std::string getUsername() const;
 		std::string getNickname() const;
 		bool 		getIsAuthed() const;
 		std::string&	getBuffer();
 
 		//Setter
+		void setFd(int fd);
 		void setNickname(std::string nickname);
 		void setUsername(std::string Username);
 		void setIsAuthed(bool value);
@@ -27,6 +29,7 @@ class User {
 		
 	private :
 
+		int			_fd;
 		bool _isAuthed;
 		std::string _username;
 		std::string _nickname;

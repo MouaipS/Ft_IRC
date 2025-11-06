@@ -60,15 +60,5 @@ void CmdJoin::execCmd(
 	sendToUser(fd_origin, "332 " + user->getNickname() + " " + cmd[1] + " :le topic", 0);
 	allChannels.push_back(new Channel(cmd[1]));
 	allChannels[0]->setNewUser(user);
-<<<<<<< Updated upstream
 	allChannels[0]->promoteUser(*user);
-=======
-	allChannels[0]->promoteUser(user);
-	sendToUser(fd_origin, "353 " + user->getNickname() + " = " + cmd[1] + " :@" 
-				+ user->getNickname(), 0);
-	// sendToUser(fd_origin, "366 " + user->getNickname() + " " + cmd[1] + " :End of /NAMES list.", 0);
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 }
