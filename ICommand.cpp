@@ -29,7 +29,7 @@ void	ICommand::sendToUser(int fd, std::string message, int flag)
 	std::cout << "DEBUG sendToUser: [" << message << "][" << _serverName << "]" << std::endl;
 	theBuffer = ":" + _serverName + " " + message + "\r\n";
 	send(fd, theBuffer.c_str(), theBuffer.length(), flag);
-	sleep(5);
+	usleep(10);
 }
 
 void	ICommand::sendToUser2(int fd, std::string message, std::string message2, int flag)
@@ -39,6 +39,6 @@ void	ICommand::sendToUser2(int fd, std::string message, std::string message2, in
 	std::cout << "DEBUG sendToUser2: [" << message << "][" << _serverName << "][" << message2 << "]" << std::endl;
 	theBuffer = ":" + message + _serverName + message2 + "\r\n";
 	send(fd, theBuffer.c_str(), theBuffer.length(), flag);
-	sleep(5);
+	usleep(10);
 
 }
