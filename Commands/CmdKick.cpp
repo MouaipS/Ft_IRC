@@ -39,9 +39,7 @@ void CmdKick::execCmd(
     (void)password;
     std::string reason;
     User *user = fdToUser[fd_origin];
-        std::cout << "===============Ici dans kick JE SUIS DEDANS==============" << std::endl;
     if(!isUserValidAuth(*user, 1,1,1)){
-        std::cout << "===============Ici dans kick 19==============" << std::endl;
         sendToUser(fd_origin, "451 " + user->getUsername() + ":You have not registered", 0);
         return;
     }
@@ -49,10 +47,8 @@ void CmdKick::execCmd(
     if(cmd.size() == 4) {
         reason = cmd[3];
     } else if(cmd.size() == 3) {
-        std::cout << "===============Ici dans kick 1145454==============" << std::endl;
-        reason = user->getUsername() + " kicked ";
+        reason = cmd[1] + " kicked ";
     } else {
-        std::cout << "===============Ici dans kick 1154564684134613546841865==============" << std::endl;
         sendToUser(fd_origin, "461 " + user->getUsername() + " KICK :Not enough parameters", 0);
         return;
     }
@@ -60,32 +56,26 @@ void CmdKick::execCmd(
     User target;
     int checkTarget = findTarget(cmd[1], cmd[2], allChannels, &target);
     if(checkTarget == 0) {
-        std::cout << "===============Ici dans kick 1==============" << std::endl;
         sendToUser(fd_origin, "353 " + user->getUsername() + " " +cmd[2] + "Empty channel", 0);    
     }else if(checkTarget == 3){
-        std::cout << "===============Ici dans kick 2==============" << std::endl;
         sendToUser(fd_origin, "403 " + user->getUsername() + " " +cmd[2] + " :No such channel", 0);    
     } else if(checkTarget == 2)
     {
-        std::cout << "===============Ici dans kick 3==============" << std::endl;
         sendToUser(fd_origin, "441 " + cmd[1] + " " + user->getUsername() + ":They aren't on that channel", 0);
     }
     else{   
-        std::cout << "===============Ici dans kick 4==============" << std::endl;  
         User userTmp;
         int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, &userTmp);
         if(checkOp == 2){
-            std::cout << "===============Ici dans kick 5==============" << std::endl;
             sendToUser(fd_origin, "442 " + user->getUsername() + " You're not on that channel", 0);
         }
         else if(checkOp != 4){
-            std::cout << "===============Ici dans kick 6==============" << std::endl;
             sendToUser(fd_origin, "482 " + user->getUsername() + " You're not channel operator", 0);
         }
         else 
         {
-            std::cout << "===============Ici dans kick 7==============" << std::endl;
-            sendToUser(fd_origin, "KICK " + cmd[2] + target.getNickname() + reason, 0);
+            
+            sendToUser(fd_origin, "KICK " + cmd[2] + " " + target.getNickname() + reason, 0);
         }
-    }    
+    }
 }

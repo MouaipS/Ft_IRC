@@ -20,6 +20,7 @@
 #include "CmdPass.hpp"
 #include "CmdPrivmsg.hpp"
 #include "CmdUser.hpp"
+#include "CmdSee.hpp"
 
 #define CHANNEL_LIMIT	1000
 #define SERVERNAME "irCnews"

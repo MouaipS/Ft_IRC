@@ -80,6 +80,9 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
+	_commands.insert(std::make_pair("see", new Cmdsee(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
 }
 
 /**
@@ -213,6 +216,7 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		// userBuffer.resize(userBuffer.size() - 2);
 		userBuffer = userBuffer.substr(0, userBuffer.length() - 2);
 		std::vector<std::string> args = splitBuffer(user);
+		std::cout << args[0] << std::endl;
 		sendToCommand(args, fd_actif);
 		userBuffer.clear();
 	} 
@@ -289,9 +293,15 @@ std::vector<std::string> Server::splitBuffer(User* user) {
 	std::stringstream							ss(user->getBuffer());
 	std::string									buffer;
 
-	while (getline(ss, buffer, ' '))
-		cmd.push_back(buffer);
+	if (user->getBuffer().empty()){
+		cmd.push_back("\n");
+		return(cmd);
+	}
 
+	while (getline(ss, buffer, ' '))
+	{
+		cmd.push_back(buffer);
+	}
 	return (cmd);
 }
 
@@ -309,8 +319,9 @@ void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 {
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
 
-	if (it == _commands.end())
+	if (it == _commands.end()){
 		send(fd_origin, "Unknown command\r\n", 18, 0); // Format unknown command
+	}
 	else
 		it->second->execCmd(fd_origin, cmd, _password, _allChannels, _fdToUser);
 }
