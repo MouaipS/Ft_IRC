@@ -21,7 +21,6 @@ void CmdMode::execCmd(
 ) {
 
     Channel *channel;
-    // TODO: Implémenter la commande Mode
     User *user = fdToUser[fd_origin];
     if(!isUserValidAuth(*user, 1,1,1)){
         sendToUser(fd_origin, "451 " + user->getUsername() + ":You have not registered", 0);
@@ -36,60 +35,50 @@ void CmdMode::execCmd(
         sendToUser(fd_origin, "482 " + user->getUsername() + ":You are not channel operator", 0);
     }
 
-    const std::string level[8] = {"-i", "+i", "t", "+k", "-k", "o", "+l", "+l"};
-	int selectLevel = 0;
+    const std::string level[10] = {"+i","-i","+k","-k","+l","-l","+o","-o","+t","-t"};
+	int selectLevel = 11;
 	
-	for(int i = 0; i < 8 ; i++) {
+	for(int i = 0; i < 10 ; i++) {
 		if(cmd[1] == level[i]) {
 			selectLevel = i;
 		}
 	}
 	switch (selectLevel) {
         case 0:
-            ModeIm(*channel);
+            ModeIp(*channel);
 			break;
         case 1:
-            ModeIp(*channel);
+            ModeIm(*channel);
             break;
         case 2:
             if(!cmd[3].empty())
                 ModeKp(*channel, cmd[3]);
 			break;
         case 3:
-            if(!cmd[3].empty())
-                ModeKm(*channel, cmd[3]);
+                ModeKm(*channel);
             break;
         case 4:
-                ModeLm(*channel);
+           if(!cmd[3].empty())
+                ModeLp(*channel, cmd[3]);
 			break;
         case 5:
-            if(!cmd[3].empty())
-            ModeLp(*channel, cmd[3]);
+            ModeLm(*channel);
             break;
         case 6:
-            ModeO();
+            if(!cmd[3].empty())
+                ModeOp(*channel, cmd[3]);
             break;
         case 7:
-            ModeT();
+            ModeOm(*channel, cmd[3]);
+            break;
+        case 8:
+            ModeTp(*channel);
+            break;
+        case 9:
+            ModeTm(*channel);
             break;
         default:
 			std::cout << "Please select a correct level !" << std::endl;
 	}
-
-    //Check si channel existe, si user existe et OP, check le mode demande(et parsing des arguements)
-
-    | Mode  | Effet                                         | Paramètre requis ?          |
-| ----- | --------------------------------------------- | ------------------------        |
-| **i** | Canal sur invitation seulement                |                           ❌    |
-| **t** | Seuls les opérateurs peuvent changer le topic |                           ❌    |
-| **k** | Définit un mot de passe                       |              ✅ (mot de passe)  |
-| **o** | Donne ou retire le statut opérateur           |                      ✅ (nick)  |
-| **l** | Définit une limite d’utilisateurs             |     ✅ pour `+l`, ❌ pour `-l`  |
-
-
-	(void) fd_origin;
-	(void) cmd;
 	(void) password;
-	(void) allChannels;
-	(void) fdToUser;	
 }

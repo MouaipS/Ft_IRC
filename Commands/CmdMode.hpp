@@ -12,12 +12,14 @@ class CmdMode : public ICommand {
             std::map<int, User*>& fdToUser
         );
     private:
-        void ModeO();
+        void ModeOp(Channel &channel, std::string target);
+        void ModeOm(Channel &channel, std::string target);
         void ModeIp(Channel &channel);
         void ModeIm(Channel &channel);
         void ModeLp(Channel &channel, std::string limit);
         void ModeLm(Channel &channel);
         void ModeKp(Channel &channel, std::string password);
-        void ModeKm(Channel &channel, std::string password);
-        void ModeT();
+        void ModeKm(Channel &channel);
+        void ModeTp(Channel &channel);
+        void ModeTm(Channel &channel);
 };
