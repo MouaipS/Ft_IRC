@@ -9,6 +9,7 @@ SOURCES = main.cpp \
           Commands/CmdInvite.cpp \
           Commands/CmdTopic.cpp \
           Commands/CmdMode.cpp \
+          Commands/CmdModeSub.cpp \
           Commands/CmdJoin.cpp \
           Commands/CmdNick.cpp \
           Commands/CmdPass.cpp \
