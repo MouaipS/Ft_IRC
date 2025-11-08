@@ -44,7 +44,7 @@ class Channel {
 		void	removeUserFromChannel(User& user);
 		void	promoteUser(User &user);
 		void	demoteUser(User& user);
-		
+	
 		class ChannelUserLimitExceededException: public std::exception {
 			public: const char* what() const throw();
 		};

@@ -158,8 +158,6 @@ User *Channel::findUser(std::string name) {
 	return(NULL);
 }
 
-
-
 /**
  * @brief Searches for a user in the channel's operator list.
  * 
@@ -212,13 +210,14 @@ void Channel::removeUserFromChannel(User& user)
 {
 	int user_index;
 	int operator_index;
-
+	
 	user_index = findUser(user);
 	operator_index = findOperator(user);
-
-	if (operator_index >= 0)
+	
+	if (operator_index >= 0){
+		
 		_operators.erase(_operators.begin() + operator_index);
-
+	}
 	if (user_index < 0)
 		throw (UserNotFoundInChannelException());
 

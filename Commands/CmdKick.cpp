@@ -12,7 +12,7 @@ CmdKick::CmdKick(std::string serverName) : ICommand::ICommand(serverName) {};
  * - 3 : Can't find the channel
  * - 4 : Is op
  */
-int findTarget(std::string target, std::string channel, std::vector<Channel*>& allChannels, User *userTarget) {
+int findTarget(std::string target, std::string channel, std::vector<Channel*>& allChannels, User *&userTarget) {
     std::vector<Channel*>::iterator it = allChannels.begin();
     for(; it != allChannels.end(); it++){
         if((*it)->getName() == channel)
@@ -27,6 +27,16 @@ int findTarget(std::string target, std::string channel, std::vector<Channel*>& a
         }
     }
     return(3);
+}
+
+void eraseUser(std::string channel, std::vector<Channel*>& allChannels, User &userTarget){
+    std::vector<Channel*>::iterator it = allChannels.begin();
+    for(; it != allChannels.end(); it++){
+        if((*it)->getName() == channel){
+            (*it)->removeUserFromChannel(userTarget);
+            return;
+        }
+    }
 }
 
 void CmdKick::execCmd(
@@ -53,8 +63,8 @@ void CmdKick::execCmd(
         return;
     }
 
-    User target;
-    int checkTarget = findTarget(cmd[1], cmd[2], allChannels, &target);
+    User *target = NULL;
+    int checkTarget = findTarget(cmd[1], cmd[2], allChannels, target);
     if(checkTarget == 0) {
         sendToUser(fd_origin, "353 " + user->getUsername() + " " +cmd[2] + "Empty channel", 0);    
     }else if(checkTarget == 3){
@@ -64,8 +74,8 @@ void CmdKick::execCmd(
         sendToUser(fd_origin, "441 " + cmd[1] + " " + user->getUsername() + ":They aren't on that channel", 0);
     }
     else{   
-        User userTmp;
-        int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, &userTmp);
+        User *userTmp;
+        int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, userTmp);
         if(checkOp == 2){
             sendToUser(fd_origin, "442 " + user->getUsername() + " You're not on that channel", 0);
         }
@@ -74,8 +84,8 @@ void CmdKick::execCmd(
         }
         else 
         {
-            
-            sendToUser(fd_origin, "KICK " + cmd[2] + " " + target.getNickname() + reason, 0);
+            eraseUser(cmd[2], allChannels, (*target));
+            sendToUser(fd_origin, "KICK " + cmd[2] + " " + (*target).getNickname() + reason, 0);
         }
     }
 }
