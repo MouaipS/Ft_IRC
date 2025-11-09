@@ -23,16 +23,22 @@ void CmdMode::execCmd(
     Channel *channel;
     User *user = fdToUser[fd_origin];
     if(!isUserValidAuth(*user, 1,1,1)){
-        sendToUser(fd_origin, "451 " + user->getUsername() + ":You have not registered", 0);
+        sendToUser(fd_origin, "451 " + user->getUsername() + " :You have not registered", 0);
+        return;
+    }
+    if(cmd.size() < 3 || cmd[2].empty()){
+        sendToUser(fd_origin, "461 " + user->getUsername() + " MODE :Not enough parameters", 0);
         return;
     }
     try{
         channel = findChannel(cmd[2], allChannels);
-    }catch(std::exception& e){ sendToUser(fd_origin, "403 " + user->getUsername() + " :No such channel", 0);}
+    }catch(std::exception& e){ sendToUser(fd_origin, "403 " + user->getUsername() + " :No such channel", 0); return;}
     if(channel->findUser(*user) == -1){
-        sendToUser(fd_origin, "442 " + user->getUsername() + ":You are not on that channel", 0);
+        sendToUser(fd_origin, "442 " + user->getUsername() + " :You are not on that channel", 0);
+        return;
     } else if(channel->findOperator(*user) == -1){
-        sendToUser(fd_origin, "482 " + user->getUsername() + ":You are not channel operator", 0);
+        sendToUser(fd_origin, "482 " + user->getUsername() + " :You are not channel operator", 0);
+        return;
     }
 
     const std::string level[10] = {"+i","-i","+k","-k","+l","-l","+o","-o","+t","-t"};

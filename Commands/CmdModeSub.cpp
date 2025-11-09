@@ -64,7 +64,7 @@ void CmdMode::ModeOp(Channel &channel, std::string target){
 		sendToUser(1,"PROBLEME TARGET EXISTE PAS",0);
 		return;
 	}
-	if(channel.findOperator(*userTarget) == -1){
+	if(channel.findOperator(*userTarget) != -1){
 		sendToUser(1,"PROBLEME TARGET EST DEJA OP",0);
 		return;
 	}
@@ -79,7 +79,7 @@ void CmdMode::ModeOm(Channel &channel, std::string target){
 		sendToUser(1,"PROBLEME TARGET EXISTE PAS",0);
 		return;
 	}
-	if(channel.findOperator(*userTarget) != -1){
+	if(channel.findOperator(*userTarget) == -1){
 		sendToUser(1,"PROBLEME TARGET EST DEJA PAS OP",0);
 		return;
 	}

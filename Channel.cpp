@@ -3,7 +3,7 @@
 
 Channel::Channel(std::string name) : _name(name)
 {
-	_isInviteOnly = true;
+	_isInviteOnly = false;
 	_isTopicProtected = true;
 	_isKeyProtected = false;
 	_isUserLimit = true;
