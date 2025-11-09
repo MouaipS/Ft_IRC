@@ -57,21 +57,21 @@ void CmdMode::execCmd(
             ModeIm(*channel);
             break;
         case 2:
-            if(!cmd[3].empty())
+            if(cmd.size() >= 4 && (!cmd[3].empty()))
                 ModeKp(*channel, cmd[3]);
 			break;
         case 3:
                 ModeKm(*channel);
             break;
         case 4:
-           if(!cmd[3].empty())
+           if(cmd.size() >= 4 && (!cmd[3].empty()))
                 ModeLp(*channel, cmd[3]);
 			break;
         case 5:
             ModeLm(*channel);
             break;
         case 6:
-            if(!cmd[3].empty())
+            if(cmd.size() >= 4 && (!cmd[3].empty()))
                 ModeOp(*channel, cmd[3]);
             break;
         case 7:

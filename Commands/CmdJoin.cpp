@@ -47,21 +47,16 @@ void CmdJoin::execCmd(
 	}
 	for (; it != allChannels.end(); it++) {
 
-		std::cout << "Nom du channel avant : " << (*it)->getName() << std::endl;
 		if ((*it)->getName() == cmd[1])
 		{
-			//check si le channel existe deja et si le user est deja dedans
-				//->si oui rien
-				//si pas dedans on le rajoute
-				//si existe pas on le creer
 			if (alreadyOnChannel(user, (*it)->getUsers()))
 			{
-				std::cout << "deja la" << std::endl;
+				std::cout << "User deja dans le channel" << std::endl;
 				return ;
 			}
 			else
 			{
-				std::cout << "channel existe deja" << std::endl;
+				std::cout << "Le Channel existe deja mais le user n'est pas dedans" << std::endl;
 				sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
 							" JOIN " + cmd[1], 0);
 				Channel *channel = findChannel(allChannels, cmd[1]);
@@ -70,7 +65,7 @@ void CmdJoin::execCmd(
 			}
 		}
 	}
-	std::cout << "creer channel" << std::endl;
+	std::cout << "Le channel existe pas donc creation du channel" << std::endl;
 	sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
 				" JOIN " + cmd[1], 0);
 	sendToUser(fd_origin, "332 " + user->getNickname() + " " + cmd[1] + " :le topic", 0);
