@@ -12,6 +12,16 @@ static int	alreadyOnChannel(User* user, std::vector<User*> allUsers) {
 	return 0;
 }
 
+static Channel *findChannel(std::vector<Channel*>& allChannels, std::string name){
+	std::vector<Channel*>::iterator it = allChannels.begin();
+	for(;it != allChannels.end(); it++) {
+		 if((*it)->getName() == name){
+			break;
+		 }
+	}
+	return(*it);
+}
+
 void CmdJoin::execCmd(
 		int fd_origin,
 		std::vector<std::string>& cmd,
@@ -37,8 +47,13 @@ void CmdJoin::execCmd(
 	}
 	for (; it != allChannels.end(); it++) {
 
+		std::cout << "Nom du channel avant : " << (*it)->getName() << std::endl;
 		if ((*it)->getName() == cmd[1])
-			{
+		{
+			//check si le channel existe deja et si le user est deja dedans
+				//->si oui rien
+				//si pas dedans on le rajoute
+				//si existe pas on le creer
 			if (alreadyOnChannel(user, (*it)->getUsers()))
 			{
 				std::cout << "deja la" << std::endl;
@@ -49,7 +64,8 @@ void CmdJoin::execCmd(
 				std::cout << "channel existe deja" << std::endl;
 				sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
 							" JOIN " + cmd[1], 0);
-				allChannels[0]->setNewUser(user);
+				Channel *channel = findChannel(allChannels, cmd[1]);
+				channel->setNewUser(user);
 				return ;
 			}
 		}
@@ -59,6 +75,7 @@ void CmdJoin::execCmd(
 				" JOIN " + cmd[1], 0);
 	sendToUser(fd_origin, "332 " + user->getNickname() + " " + cmd[1] + " :le topic", 0);
 	allChannels.push_back(new Channel(cmd[1]));
-	allChannels[0]->setNewUser(user);
-	allChannels[0]->promoteUser(*user);
+	Channel *channel = findChannel(allChannels, cmd[1]);
+	channel->setNewUser(user);
+	channel->promoteUser(*user);
 }
