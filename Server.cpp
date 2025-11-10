@@ -80,7 +80,10 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("see", new Cmdsee(SERVERNAME)));
+	_commands.insert(std::make_pair("SEE", new Cmdsee(SERVERNAME)));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("TEST", new CmdTest(SERVERNAME)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 }

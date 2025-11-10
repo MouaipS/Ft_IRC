@@ -21,6 +21,7 @@
 #include "CmdPrivmsg.hpp"
 #include "CmdUser.hpp"
 #include "CmdSee.hpp"
+#include "CmdTest.hpp"
 
 #define CHANNEL_LIMIT	1000
 #define SERVERNAME "irCnews"

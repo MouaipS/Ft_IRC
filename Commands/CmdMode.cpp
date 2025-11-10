@@ -3,7 +3,7 @@
 
 CmdMode::CmdMode(std::string serverName) : ICommand::ICommand(serverName) {};
 
-Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels){
+static Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels){
     std::vector<Channel*>::iterator it = allChannels.begin();
     for(; it != allChannels.end(); it++){
         if((*it)->getName() == channel)
