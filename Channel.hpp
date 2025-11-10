@@ -21,6 +21,7 @@ class Channel {
 		bool				getIsKeyProtected() const;
 		bool				getIsLimit() const;
 		size_t				getUserLimit() const;
+		std::vector<User*>	getGuestList() const;
 		
 		// SET
 
@@ -44,6 +45,7 @@ class Channel {
 		void	removeUserFromChannel(User& user);
 		void	promoteUser(User &user);
 		void	demoteUser(User& user);
+		void	addGuest(User& user);
 	
 		class ChannelUserLimitExceededException: public std::exception {
 			public: const char* what() const throw();
@@ -71,6 +73,7 @@ class Channel {
 		std::vector<User*>	_operators;
 		std::string 		_topic;
 		std::string 		_key;
+		std::vector<User*>	_guestlist;
 		bool				_isInviteOnly;
 		bool 				_isTopicProtected;
 		bool 				_isKeyProtected;

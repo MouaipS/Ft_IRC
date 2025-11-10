@@ -66,6 +66,10 @@ size_t Channel::getUserLimit() const
     return _userLimit;
 }
 
+std::vector<User*> Channel::getGuestList() const{
+	return _guestlist;
+}
+
 
 // ------------- SET  ------------- //
 
@@ -266,6 +270,10 @@ void Channel::demoteUser(User &user)
 		throw (UserNotOperatorException());
 
 	_operators.erase(_operators.begin() + operator_index);
+}
+
+void	Channel::addGuest(User &user){
+	_guestlist.push_back(&user);
 }
 
 // Exceptions
