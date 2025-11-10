@@ -52,6 +52,7 @@ void Cmdsee::execCmd(
 		std::cout << YELLOW << "Limit enabled   : " << RESET << (*it)->getIsLimit() << std::endl;
 		std::cout << YELLOW << "User limit      : " << RESET << (*it)->getUserLimit() << std::endl;
 
+		printUsers((*it)->getGuestList(), "GUEST LIST");
 		printUsers((*it)->getUsers(), "CONNECTED USERS");
 		printUsers((*it)->getOperators(), "CHANNEL OPERATORS");
 	}

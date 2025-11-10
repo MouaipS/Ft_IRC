@@ -56,7 +56,7 @@ void CmdInvite::execCmd(
         return;
     }
     if(channel->getIsInviteOnly() ==  true){
-        if(channel->findOperator(*user) == true){
+        if(channel->findOperator(*user) != -1){
             channel->addGuest(*target);
             std::cout << "INVITE POUR LA TARGET (MODE ACTIV)" <<std::endl;
             sendToUser(1, "INVITE POUR LA TARGET", 0);
