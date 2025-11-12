@@ -7,7 +7,7 @@
 class ICommand {
 
 	public:
-		ICommand(std::string serverName);
+		ICommand();
 		virtual ~ICommand();
 		
 		virtual void execCmd (	
@@ -25,11 +25,7 @@ class ICommand {
 		class ChannelNotFoundException: public std::exception {
 			public: const char* what() const throw();
 		};
-
-		bool	isUserValidAuth(User& user, bool pass, bool nick, bool username);
-		void	sendToUser(int fd, std::string message, int flag);
-		void	sendToUser2(int fd, std::string message, std::string message2, int flag);
-	
-	protected:
-		const std::string _serverName;
 };
+
+
+

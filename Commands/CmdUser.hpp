@@ -3,7 +3,7 @@
 
 class CmdUser : public ICommand {
 public:
-	CmdUser(std::string serverName);
+	CmdUser();
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

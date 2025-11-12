@@ -1,6 +1,7 @@
 #include "CmdKick.hpp"
-
-CmdKick::CmdKick(std::string serverName) : ICommand::ICommand(serverName) {};
+#include "Utils.hpp"
+#include "Exception.hpp"
+CmdKick::CmdKick() : ICommand::ICommand() {};
 
 
 /**
@@ -49,43 +50,38 @@ void CmdKick::execCmd(
     (void)password;
     std::string reason;
     User *user = fdToUser[fd_origin];
-    if(!isUserValidAuth(*user, 1,1,1)){
-        sendToUser(fd_origin, "451 " + user->getUsername() + ":You have not registered", 0);
-        return;
-    }
+    if(!isUserValidAuth(*user, 1,1,1))
+		throw ExceptionCode(ERR_NOTREGISTERED);
 
     if(cmd.size() == 4) {
         reason = cmd[3];
     } else if(cmd.size() == 3) {
         reason = cmd[1] + " kicked ";
-    } else {
-        sendToUser(fd_origin, "461 " + user->getUsername() + " KICK :Not enough parameters", 0);
-        return;
-    }
+    } else
+		throw ExceptionCode(ERR_NEEDMOREPARAMS);
 
     User *target = NULL;
     int checkTarget = findTarget(cmd[1], cmd[2], allChannels, target);
-    if(checkTarget == 0) {
-        sendToUser(fd_origin, "353 " + user->getUsername() + " " +cmd[2] + "Empty channel", 0);    
-    }else if(checkTarget == 3){
-        sendToUser(fd_origin, "403 " + user->getUsername() + " " +cmd[2] + " :No such channel", 0);    
-    } else if(checkTarget == 2)
-    {
-        sendToUser(fd_origin, "441 " + cmd[1] + " " + user->getUsername() + ":They aren't on that channel", 0);
+    if (checkTarget == 0) {
+        serverReply(fd_origin, "353 " + user->getUsername() + " " +cmd[2] + "Empty channel", 0);   
+    } else if(checkTarget == 3) {
+		throw ExceptionCode(ERR_NOSUCHCHANNEL); 
+    } else if(checkTarget == 2) {
+		throw ExceptionCode(ERR_USERNOTINCHANNEL);
     }
-    else{   
+    else {   
         User *userTmp;
         int checkOp = findTarget(user->getUsername(), cmd[2], allChannels, userTmp);
         if(checkOp == 2){
-            sendToUser(fd_origin, "442 " + user->getUsername() + " You're not on that channel", 0);
+			throw ExceptionCode(ERR_NOTONCHANNEL);
         }
         else if(checkOp != 4){
-            sendToUser(fd_origin, "482 " + user->getUsername() + " You're not channel operator", 0);
+			throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
         }
         else 
         {
             eraseUser(cmd[2], allChannels, (*target));
-            sendToUser(fd_origin, "KICK " + cmd[2] + " " + (*target).getNickname() + reason, 0);
+            serverReply(fd_origin, "KICK " + cmd[2] + " " + (*target).getNickname() + " :" + reason, 0);
         }
     }
 }

@@ -3,7 +3,7 @@
 
 class Cmdsee : public ICommand {
 public:
-	Cmdsee(std::string serverName);
+	Cmdsee();
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

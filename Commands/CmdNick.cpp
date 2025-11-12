@@ -1,6 +1,8 @@
 #include "CmdNick.hpp"
+#include "Exception.hpp"
+#include "Utils.hpp"
 
-CmdNick::CmdNick(std::string serverName) : ICommand::ICommand(serverName) {};
+CmdNick::CmdNick() : ICommand::ICommand() {};
 
 static bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*>& fdToUser) {
     if(user->isNicknameValid(CorrectNick) == true) {
@@ -23,21 +25,17 @@ void CmdNick::execCmd(
     User *user = fdToUser[fd_origin];
 
 	std::cout << "In CmdNick::execCmd" << std::endl;
-    if(cmd.size() < 2){
-        sendToUser(fd_origin, "431 * :No nickname given", 0);
-        return;
-    }
+    if(cmd.size() < 2)
+		throw ExceptionCode(ERR_NONICKNAMEGIVEN);
     std::string CorrectNick = cmd[1];
-    if(isAvailable(CorrectNick, user, fdToUser) == false) {  
-        sendToUser(fd_origin, "433 * " + CorrectNick + " :Nickname is already in use", 0);
-    }
-    else if(user->getIsAuthed() == false) {
-        sendToUser(fd_origin, "464 " + user->getNickname() + " :Password incorrect", 0);
-    }
+    if (isAvailable(CorrectNick, user, fdToUser) == false)
+		throw ExceptionCode(ERR_NICKNAMEINUSE);
+    else if (user->getIsAuthed() == false)
+		throw ExceptionCode(ERR_PASSWDMISMATCH);
     else if (isUserValidAuth(*user, 1, 0, 1)) {
         user->setNickname(cmd[1]);
 		user->setFd(fd_origin);
-        sendToUser(fd_origin, "001 " + CorrectNick + " :Welcome to the IRC Network", 0);
+        serverReply(fd_origin, "001 " + CorrectNick + " :Welcome to the IRC Network", 0);
     }
     else {user->setNickname(cmd[1]);}
 }

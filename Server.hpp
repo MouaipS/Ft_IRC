@@ -11,16 +11,16 @@
 #include <bits/stdc++.h>
 #include <fcntl.h>
 #include "sys/epoll.h"
-#include "CmdKick.hpp"
-#include "CmdInvite.hpp"
-#include "CmdTopic.hpp"
-#include "CmdMode.hpp"
-#include "CmdJoin.hpp"
-#include "CmdNick.hpp"
-#include "CmdPass.hpp"
-#include "CmdPrivmsg.hpp"
-#include "CmdUser.hpp"
-#include "CmdSee.hpp"
+#include "Commands/CmdKick.hpp"
+#include "Commands/CmdInvite.hpp"
+#include "Commands/CmdTopic.hpp"
+#include "Commands/CmdMode.hpp"
+#include "Commands/CmdJoin.hpp"
+#include "Commands/CmdNick.hpp"
+#include "Commands/CmdPass.hpp"
+#include "Commands/CmdPrivmsg.hpp"
+#include "Commands/CmdUser.hpp"
+#include "Commands/CmdSee.hpp"
 
 #define CHANNEL_LIMIT	1000
 #define SERVERNAME "irCnews"

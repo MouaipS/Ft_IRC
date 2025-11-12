@@ -1,4 +1,5 @@
 #include "CmdMode.hpp"
+#include "Utils.hpp"
 #include <climits>
 
 bool isValidLimit(const std::string &str, int &out)
@@ -50,7 +51,7 @@ void CmdMode::ModeLp(Channel &channel, std::string limit){
 	int newLimit;
 	if(isValidLimit(limit,newLimit) == false)
 	{
-		sendToUser(1, "PARAM INVALIDE", 1);
+		serverReply(1, "PARAM INVALIDE", 1);
 		return;
 	}
 	channel.setIsLimit(true);
@@ -61,30 +62,30 @@ void CmdMode::ModeOp(Channel &channel, std::string target){
 	User *userTarget;
 	userTarget = channel.findUser(target);
 	if(userTarget == NULL) {
-		sendToUser(1,"PROBLEME TARGET EXISTE PAS",0);
+		serverReply(1,"PROBLEME TARGET EXISTE PAS",0);
 		return;
 	}
 	if(channel.findOperator(*userTarget) != -1){
-		sendToUser(1,"PROBLEME TARGET EST DEJA OP",0);
+		serverReply(1,"PROBLEME TARGET EST DEJA OP",0);
 		return;
 	}
 	channel.promoteUser(*userTarget);
-	sendToUser(1, "PROMOTE USER SUCESS", 0);
+	serverReply(1, "PROMOTE USER SUCESS", 0);
 }
 
 void CmdMode::ModeOm(Channel &channel, std::string target){
 	User *userTarget;
 	userTarget = channel.findUser(target);
 	if(userTarget == NULL) {
-		sendToUser(1,"PROBLEME TARGET EXISTE PAS",0);
+		serverReply(1,"PROBLEME TARGET EXISTE PAS",0);
 		return;
 	}
 	if(channel.findOperator(*userTarget) == -1){
-		sendToUser(1,"PROBLEME TARGET EST DEJA PAS OP",0);
+		serverReply(1,"PROBLEME TARGET EST DEJA PAS OP",0);
 		return;
 	}
 	channel.demoteUser(*userTarget);
-	sendToUser(1, "DEMOTE USER SUCESS", 0);
+	serverReply(1, "DEMOTE USER SUCESS", 0);
 }
 
 void CmdMode::ModeTp(Channel &channel){

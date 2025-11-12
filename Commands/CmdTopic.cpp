@@ -1,6 +1,8 @@
 #include "CmdTopic.hpp"
+#include "Exception.hpp"
+#include "Utils.hpp"
 
-CmdTopic::CmdTopic(std::string serverName) : ICommand::ICommand(serverName) {};
+CmdTopic::CmdTopic() : ICommand::ICommand() {};
 
 void CmdTopic::execCmd(
     int fd_origin,
@@ -16,15 +18,9 @@ void CmdTopic::execCmd(
 	User*							user = fdToUser[fd_origin];
 
 	if (!isUserValidAuth(*user, 1, 1, 1))
-	{
-		sendToUser(fd_origin, "464 :Password incorrect", 0);
-		return ;
-	}
+		throw ExceptionCode(ERR_PASSWDMISMATCH);
 	if (cmd.size() == 1)
-	{
-		sendToUser(fd_origin, "461 :Not enough parameters", 0);
-		return ;
-	}
+		throw ExceptionCode(ERR_NEEDMOREPARAMS);
 
 	for (size_t i = 0; i < allChannels.size(); i++) {
 
@@ -32,7 +28,8 @@ void CmdTopic::execCmd(
 
 			if (cmd.size() == 2) {
 
-				sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername(), " TOPIC " + cmd[1] + " :" + allChannels[i]->getTopic(), 0);
+				// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername(), " TOPIC " + cmd[1] + " :" + allChannels[i]->getTopic(), 0);
+				clientReply(fd_origin, user->getNickname(), user->getUsername(), "TOPIC", cmd[1], allChannels[i]->getTopic(), 0);
 				return ;
 			}
 			else
@@ -57,11 +54,12 @@ void CmdTopic::execCmd(
 
 					std::vector<User*>	myUser = allChannels[i]->getUsers();
 					for (size_t i = 0; i < myUser.size(); i++)
-						sendToUser2(myUser[i]->getFd(), user->getNickname() + "!" + user->getUsername() + "@", " TOPIC " + cmd[1] + " :" + message, 0);
+						// sendToUser2(myUser[i]->getFd(), user->getNickname() + "!" + user->getUsername() + "@", " TOPIC " + cmd[1] + " :" + message, 0);
+						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", cmd[1], message, 0);
 					return ;
 				}
 			}
 		}
 	}
-	sendToUser(fd_origin, "401 " + cmd[1] + " :No such Nick/Channel", 0);
+	throw ExceptionCode(ERR_NOSUCHNICK);
 }
