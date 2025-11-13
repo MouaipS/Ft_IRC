@@ -47,7 +47,6 @@ void CmdPrivmsg::execCmd(
 				std::vector<User*>	myUser = allChannels[i]->getUsers();
 				for (size_t j = 0; j < myUser.size(); j++)
 					clientReply(myUser[j]->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
-					// sendToUser2(myUser[j]->getFd(), user->getNickname() + "!" + user->getUsername() + "@", " PRIVMSG " + cmd[1] + " :" + message, 0);
 				return ;
 			}
 			// otherwise he can't send the message
@@ -64,7 +63,6 @@ void CmdPrivmsg::execCmd(
 		{
 			// send the message to the user
 			clientReply(it->second->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
-			// sendToUser2(it->second->getFd(), user->getNickname() + "!" + user->getUsername() + "@", " PRIVMSG " + cmd[1] + " :" + message, 0);
 			return ;
 		}
 	}

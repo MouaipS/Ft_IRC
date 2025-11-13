@@ -176,7 +176,7 @@ void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
 
 	buffer.clear();
 	std::string message = ":";
-	message = message + SERVERNAME + " 417 " + user->getNickname() + " :Input line was too long\r\n";
+	message = message + getServerName() + " 417 " + user->getNickname() + " :Input line was too long\r\n";
 	send(fd, message.c_str(), message.length(), 0);
 }
 

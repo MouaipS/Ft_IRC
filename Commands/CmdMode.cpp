@@ -12,7 +12,6 @@ Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels) {
             return((*it));
     }
 	return 0;
-    // throw ICommand::ChannelNotFoundException();
 }
 
 void CmdMode::execCmd(
@@ -29,11 +28,9 @@ void CmdMode::execCmd(
 		throw ExceptionCode(ERR_NOTREGISTERED);
     if (cmd.size() < 3 || cmd[2].empty())
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
-    // try {
     channel = findChannel(cmd[2], allChannels);
 	if (!channel)
 		throw ExceptionCode(ERR_NOSUCHCHANNEL);
-    // } catch(std::exception& e){ sendToUser(fd_origin, "403 " + user->getUsername() + " :No such channel", 0); return;}
     if (channel->findUser(*user) == -1) {
 		throw ExceptionCode(ERR_NOTONCHANNEL);
     } else if (channel->findOperator(*user) == -1) {

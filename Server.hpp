@@ -23,7 +23,6 @@
 #include "Commands/CmdSee.hpp"
 
 #define CHANNEL_LIMIT	1000
-#define SERVERNAME "irCnews"
 #define BUFFER_SIZE 512
 
 enum command {

@@ -14,14 +14,42 @@ static int	alreadyOnChannel(User* user, std::vector<User*> allUsers) {
 	return 0;
 }
 
-static Channel *findChannel(std::vector<Channel*>& allChannels, std::string name){
+static Channel *findChannel(std::vector<Channel*>& allChannels, std::string name) {
+
 	std::vector<Channel*>::iterator it = allChannels.begin();
 	for(;it != allChannels.end(); it++) {
-		 if((*it)->getName() == name){
+
+		 if((*it)->getName() == name)
 			break;
-		 }
 	}
 	return(*it);
+}
+
+static void	leaveAllChannels(std::vector<Channel*>& allChannels, User&	user) {
+
+	for (size_t i = 0; i < allChannels.size(); i++) {
+
+		std::vector<User*>	allUsers = allChannels[i]->getUsers();
+		for (size_t j = 0; j < allUsers.size(); j++) {
+
+			if (allUsers[j]->getNickname() == user.getNickname()) {
+
+				allChannels[i]->removeUserFromChannel(user);
+				break ;
+			}
+		}
+	}
+}
+
+static std::vector<std::string>	splitArgs(std::string chanToJoin) {
+
+	std::vector<std::string>					cmd;
+	std::stringstream							ss(chanToJoin);
+	std::string									buffer;
+
+	while (getline(ss, buffer, ','))
+		cmd.push_back(buffer);
+	return (cmd);
 }
 
 void CmdJoin::execCmd(
@@ -33,62 +61,75 @@ void CmdJoin::execCmd(
 {
 
 	(void) password;
-	//TODO verifier que user est authentifié + que cmd[1] existe
-	std::vector<Channel*>::iterator	it = allChannels.begin();
 	User*							user = fdToUser[fd_origin];
 
 	if (!isUserValidAuth(*user, 1, 1, 1))
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
 	if (cmd.size() == 1)
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
-	for (; it != allChannels.end(); it++) {
+	if (cmd[1].size() == 1 && cmd[1][0] == '0') {
 
-		if ((*it)->getName() == cmd[1])
-		{
-			std::cout << "nick: " << user->getNickname() << std::endl;
-			if (alreadyOnChannel(user, (*it)->getUsers()))
-			{
-				std::cout << "User deja dans le channel" << std::endl;
-				return ;
-			}
-			else
-			{
-				std::cout << "Le Channel existe deja mais le user n'est pas dedans" << std::endl;
-				// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
-							// " JOIN " + cmd[1], 0);
-				serverReply(fd_origin, "JOIN " + cmd[1], 0);
-				Channel *channel = findChannel(allChannels, cmd[1]);
-				channel->setNewUser(user);
-				// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
-				// " 332 = " + cmd[1] + " :" + channel->getTopic(), 0);
-				serverReply(fd_origin, "332 = " + cmd[1] + " :" + channel->getTopic(), 0);
-
-				std::string	tmp;
-				for (size_t i = 0; i < channel->getUsers().size(); i++) {
-
-					tmp += channel->getUsers()[i]->getNickname();
-					if (i == channel->getUsers().size() - 1)
-						break;
-					tmp += ' ';
-				}
-
-				// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
-				// " 353 = " + cmd[1] + " :" + tmp, 0);
-				serverReply(fd_origin, "353 = " + cmd[1] + " :" + tmp, 0);
-				return ;
-			}
-				
-		}
+		leaveAllChannels(allChannels, (*user));
+		return ;
 	}
-	std::cout << "Le channel existe pas donc creation du channel" << std::endl;
-	// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
-				// " JOIN " + cmd[1], 0);
-	serverReply(fd_origin, "JOIN " + cmd[1], 0);
-	// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername() + "@",
-			// " 353 = " + cmd[1] + " :" + user->getNickname(), 0);
-	serverReply(fd_origin, "353 = " + cmd[1] + " :" + user->getNickname(), 0);
-	allChannels.push_back(new Channel(cmd[1]));
-	Channel *channel = findChannel(allChannels, cmd[1]);
-	channel->setNewUser(user);
-	channel->promoteUser(*user);
+
+	std::vector<std::string>	chanToJoin = splitArgs(cmd[1]);
+	for (size_t i = 0; i < chanToJoin.size(); i++) {
+
+		if (chanToJoin[i][0] != '#' && chanToJoin[i][0] != '&')
+			throw ExceptionCode(ERR_NOSUCHCHANNEL);
+	}
+
+	std::vector<std::string>	passwords;
+	if (cmd.size() == 3)
+		passwords = splitArgs(cmd[2]);
+
+	for (size_t j = 0; j < chanToJoin.size(); j++)
+	{
+		std::vector<Channel*>::iterator	it = allChannels.begin();
+		for (; it != allChannels.end(); it++) {
+
+			if ((*it)->getName() == chanToJoin[j])
+			{
+				std::cout << "nick: " << user->getNickname() << std::endl;
+				if (alreadyOnChannel(user, (*it)->getUsers()))
+				{
+					std::cout << "User deja dans le channel" << std::endl;
+					return ;
+				}
+				else
+				{
+					std::cout << "Le Channel existe deja mais le user n'est pas dedans" << std::endl;
+					if ((*it)->getIsKeyProtected())
+					{
+						if (passwords[j] != (*it)->getKey())
+							throw ExceptionCode(ERR_PASSWDMISMATCH);
+					}
+					serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
+					Channel *channel = findChannel(allChannels, chanToJoin[j]);
+					channel->setNewUser(user);
+					serverReply(fd_origin, "332 = " + chanToJoin[j] + " :" + channel->getTopic(), 0);
+
+					std::string	tmp;
+					for (size_t i = 0; i < channel->getUsers().size(); i++) {
+
+						tmp += channel->getUsers()[i]->getNickname();
+						if (i == channel->getUsers().size() - 1)
+							break;
+						tmp += ' ';
+					}
+
+					serverReply(fd_origin, "353 = " + chanToJoin[j] + " :" + tmp, 0);
+					return ;
+				}
+			}
+		}
+		std::cout << "Le channel existe pas donc creation du channel" << std::endl;
+		serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
+		serverReply(fd_origin, "353 = " + chanToJoin[j] + " :" + user->getNickname(), 0);
+		allChannels.push_back(new Channel(chanToJoin[j]));
+		Channel *channel = findChannel(allChannels, chanToJoin[j]);
+		channel->setNewUser(user);
+		channel->promoteUser(*user);
+	}
 }
