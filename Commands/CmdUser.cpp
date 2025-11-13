@@ -26,7 +26,7 @@ void CmdUser::execCmd(
     (void) allChannels;
     (void) password;
 
-	User *user = fdToUser[fd_origin];
+    User *user = fdToUser[fd_origin];
     if (cmd.size() < 2)
 		throw ExceptionCode(ERR_NONICKNAMEGIVEN);
 

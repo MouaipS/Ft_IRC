@@ -28,11 +28,5 @@ void CmdPass::execCmd(
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
 	
 	user->setIsAuthed(true);
-
-    // TODO: Implémenter la commande Pass
-	(void) fd_origin;
-	(void) cmd;
 	(void) password;
-	(void) allChannels;
-	(void) fdToUser;	
 }

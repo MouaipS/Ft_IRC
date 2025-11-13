@@ -11,10 +11,7 @@ void CmdTopic::execCmd(
     std::vector<Channel*>& allChannels,
     std::map<int, User*>& fdToUser
 ) {
-    // TODO: Implémenter la commande Topic
 	(void) password;
-	(void) fdToUser;	
-
 	User*							user = fdToUser[fd_origin];
 
 	if (!isUserValidAuth(*user, 1, 1, 1))
@@ -27,8 +24,6 @@ void CmdTopic::execCmd(
 		if (cmd[1] == allChannels[i]->getName()) {
 
 			if (cmd.size() == 2) {
-
-				// sendToUser2(fd_origin, user->getNickname() + "!" + user->getUsername(), " TOPIC " + cmd[1] + " :" + allChannels[i]->getTopic(), 0);
 				clientReply(fd_origin, user->getNickname(), user->getUsername(), "TOPIC", cmd[1], allChannels[i]->getTopic(), 0);
 				return ;
 			}
@@ -54,7 +49,6 @@ void CmdTopic::execCmd(
 
 					std::vector<User*>	myUser = allChannels[i]->getUsers();
 					for (size_t i = 0; i < myUser.size(); i++)
-						// sendToUser2(myUser[i]->getFd(), user->getNickname() + "!" + user->getUsername() + "@", " TOPIC " + cmd[1] + " :" + message, 0);
 						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", cmd[1], message, 0);
 					return ;
 				}

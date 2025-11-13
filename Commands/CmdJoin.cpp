@@ -91,15 +91,10 @@ void CmdJoin::execCmd(
 
 			if ((*it)->getName() == chanToJoin[j])
 			{
-				std::cout << "nick: " << user->getNickname() << std::endl;
 				if (alreadyOnChannel(user, (*it)->getUsers()))
-				{
-					std::cout << "User deja dans le channel" << std::endl;
-					return ;
-				}
+						throw ExceptionCode(ERR_USERONCHANNEL);
 				else
 				{
-					std::cout << "Le Channel existe deja mais le user n'est pas dedans" << std::endl;
 					if ((*it)->getIsKeyProtected())
 					{
 						if (passwords[j] != (*it)->getKey())
@@ -124,12 +119,11 @@ void CmdJoin::execCmd(
 				}
 			}
 		}
-		std::cout << "Le channel existe pas donc creation du channel" << std::endl;
-		serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
-		serverReply(fd_origin, "353 = " + chanToJoin[j] + " :" + user->getNickname(), 0);
 		allChannels.push_back(new Channel(chanToJoin[j]));
 		Channel *channel = findChannel(allChannels, chanToJoin[j]);
 		channel->setNewUser(user);
 		channel->promoteUser(*user);
+		serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
+		serverReply(fd_origin, "353 = " + chanToJoin[j] + " :" + user->getNickname(), 0);
 	}
 }
