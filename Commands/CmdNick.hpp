@@ -3,7 +3,7 @@
 
 class CmdNick : public ICommand {
 public:
-	CmdNick(std::string serverName);
+	CmdNick();
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

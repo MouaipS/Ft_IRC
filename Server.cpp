@@ -1,5 +1,6 @@
 #include "Server.hpp"
-#include "ICommand.hpp"
+#include "Exception.hpp"
+#include "Utils.hpp"
 #include <vector>
 
 Server::Server(std::string port, std::string password): _port(port), _password(password) {}
@@ -53,37 +54,34 @@ void Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
  */
 void	Server::initCommands() {
 
-	_commands.insert(std::make_pair("USER", new CmdUser(SERVERNAME)));
+	_commands.insert(std::make_pair("USER", new CmdUser()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("TOPIC", new CmdTopic(SERVERNAME)));
+	_commands.insert(std::make_pair("TOPIC", new CmdTopic()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg(SERVERNAME)));
+	_commands.insert(std::make_pair("PRIVMSG", new CmdPrivmsg()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("PASS", new CmdPass(SERVERNAME)));
+	_commands.insert(std::make_pair("PASS", new CmdPass()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("NICK", new CmdNick(SERVERNAME)));
+	_commands.insert(std::make_pair("NICK", new CmdNick()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("MODE", new CmdMode(SERVERNAME)));
+	_commands.insert(std::make_pair("MODE", new CmdMode()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("KICK", new CmdKick(SERVERNAME)));
+	_commands.insert(std::make_pair("KICK", new CmdKick()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("JOIN", new CmdJoin(SERVERNAME)));
+	_commands.insert(std::make_pair("JOIN", new CmdJoin()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("INVITE", new CmdInvite(SERVERNAME)));
+	_commands.insert(std::make_pair("INVITE", new CmdInvite()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("SEE", new Cmdsee(SERVERNAME)));
-	if (!_commands.begin()->second)
-		throw InitCommandFail();
-	_commands.insert(std::make_pair("TEST", new CmdTest(SERVERNAME)));
+	_commands.insert(std::make_pair("see", new Cmdsee()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 }
@@ -178,7 +176,7 @@ void Server::handleBufferTooLong(int fd, User *user, std::string& buffer)
 
 	buffer.clear();
 	std::string message = ":";
-	message = message + SERVERNAME + " 417 " + user->getNickname() + " :Input line was too long\r\n";
+	message = message + getServerName() + " 417 " + user->getNickname() + " :Input line was too long\r\n";
 	send(fd, message.c_str(), message.length(), 0);
 }
 
@@ -321,12 +319,18 @@ std::vector<std::string> Server::splitBuffer(User* user) {
 void	Server::sendToCommand(std::vector<std::string> cmd, int fd_origin)
 {
 	std::map<std::string, ICommand*>::iterator	it = _commands.find(cmd[0]);
-
-	if (it == _commands.end()){
-		send(fd_origin, "Unknown command\r\n", 18, 0); // Format unknown command
+	try
+	{
+		if (it == _commands.end())
+			throw ExceptionCode(ERR_UNKNOWNCOMMAND);
+		else
+			it->second->execCmd(fd_origin, cmd, _password, _allChannels, _fdToUser);
 	}
-	else
-		it->second->execCmd(fd_origin, cmd, _password, _allChannels, _fdToUser);
+	catch (const ExceptionCode& e)
+	{
+		User*	user = _fdToUser[fd_origin];
+		serverReply(fd_origin, e.to_string() + " " + user->getNickname() + " " + e.what(), 0);
+	}
 }
 
 // E X C E P T I O N S

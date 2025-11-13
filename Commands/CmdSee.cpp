@@ -1,7 +1,7 @@
 #include "CmdSee.hpp"
 #include <algorithm>
 
-Cmdsee::Cmdsee(std::string serverName) : ICommand::ICommand(serverName) {};
+Cmdsee::Cmdsee() : ICommand::ICommand() {};
 
 #define RESET   "\033[0m"
 #define CYAN    "\033[36m"

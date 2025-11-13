@@ -3,7 +3,7 @@
 
 class CmdTopic : public ICommand {
 public:
-	CmdTopic(std::string serverName);
+	CmdTopic();
     void execCmd(
         int fd_origin,
         std::vector<std::string>& cmd,

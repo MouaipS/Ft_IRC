@@ -5,6 +5,8 @@ SOURCES = main.cpp \
           User.cpp \
           Channel.cpp \
           ICommand.cpp \
+		  Exception.cpp \
+		  Utils.cpp \
           Commands/CmdKick.cpp \
           Commands/CmdInvite.cpp \
           Commands/CmdTopic.cpp \
@@ -38,6 +40,10 @@ $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR) $(OBJDIR)/Commands
+
+run: all
+	./ircserv 6667 oui
+	./ircserv 6668 oui
 
 fclean: clean
 	rm -f $(NAME)

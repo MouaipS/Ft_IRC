@@ -1,6 +1,7 @@
 #include "CmdInvite.hpp"
+#include "Utils.hpp"
 
-CmdInvite::CmdInvite(std::string serverName) : ICommand::ICommand(serverName) {};
+CmdInvite::CmdInvite(): ICommand() {}
 
 static Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels){
     std::vector<Channel*>::iterator it = allChannels.begin();

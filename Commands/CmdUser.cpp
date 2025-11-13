@@ -1,14 +1,18 @@
 #include "CmdUser.hpp"
+#include "Utils.hpp"
+#include "Exception.hpp"
 
-CmdUser::CmdUser(std::string serverName) : ICommand::ICommand(serverName) {};
+CmdUser::CmdUser() : ICommand::ICommand() {};
 
 static bool isAvailable(std::string name, User *user, std::map<int, User*>& fdToUser) {
+
     if(user->isUsernameValid(name) == true) {
+
         std::map<int, User*>::iterator it;
-        for(it=fdToUser.begin(); it != fdToUser.end(); it++){
-            if(name == it->second->getUsername()) {
-                return(false);
-            }
+        for(it=fdToUser.begin(); it != fdToUser.end(); it++) {
+
+            if (name == it->second->getUsername())
+                return false;
         }
         return true;
     }
@@ -21,25 +25,22 @@ void CmdUser::execCmd(
 {
     (void) allChannels;
     (void) password;
-    User *user = fdToUser[fd_origin];
 
-    if (cmd.size() < 2) {
-        sendToUser(fd_origin, "431 * :No username given", 0);
-        return;
-    }
+	User *user = fdToUser[fd_origin];
+    if (cmd.size() < 2)
+		throw ExceptionCode(ERR_NONICKNAMEGIVEN);
+
     std::string correctUser = cmd[1];
-    if (isUserValidAuth(*user, 1, 1, 1)) {
-        sendToUser(fd_origin, "462 " + user->getUsername() + " :You may not reregister", 0);
-    }
-    else if (isAvailable(correctUser, user, fdToUser) == false) {  
-        sendToUser(fd_origin, "461 * :Not enough parameters", 0);
-    }
-    else if (user->getIsAuthed() == false) {
-        sendToUser(fd_origin,"464 * :Password incorrect", 0);
-    }
+    if (isUserValidAuth(*user, 1, 1, 1))
+		throw ExceptionCode(ERR_ALREADYREGISTRED);
+    else if (isAvailable(correctUser, user, fdToUser) == false)
+		throw ExceptionCode(ERR_NEEDMOREPARAMS);
+    else if (user->getIsAuthed() == false)
+		throw ExceptionCode(ERR_PASSWDMISMATCH);
     else if (isUserValidAuth(*user, 1, 1, 0)) {
+
         user->setUsername(correctUser);
-        sendToUser(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
+        serverReply(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
     }
-    else {user->setUsername(correctUser);}
+    else { user->setUsername(correctUser); }
 }
