@@ -16,6 +16,7 @@ void CmdPass::execCmd(
     std::vector<Channel*>& allChannels,
     std::map<int, User*>& fdToUser)
 {
+	(void)allChannels;
 	User* user = fdToUser[fd_origin];
 	
 	if (cmd.size() < 2)

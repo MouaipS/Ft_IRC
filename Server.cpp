@@ -243,7 +243,7 @@ void	Server::epollServer()
 	dataEpoll.data.fd = _sockfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, _sockfd, &dataEpoll);
 
-	while (1)
+	while (sigStatus)
 	{
 		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
 		if (nb_event == -1)
@@ -251,6 +251,8 @@ void	Server::epollServer()
 
 		for (int i = 0; i < nb_event; i++)
 			handle_event(events[i], dataEpoll, epoll_fd);
+		if (!sigStatus)
+			return ;
 	}
 }
 
