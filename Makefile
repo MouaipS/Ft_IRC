@@ -17,6 +17,7 @@ SOURCES = main.cpp \
           Commands/CmdPass.cpp \
           Commands/CmdPrivmsg.cpp \
           Commands/CmdUser.cpp \
+          Commands/CmdPart.cpp \
           Commands/CmdSee.cpp 
 
 OBJ = $(SOURCES:.cpp=.o)
