@@ -69,6 +69,9 @@ ExceptionCode::ExceptionCode(ErrorCode id, std::string c, std::string channelNam
 		case ERR_UNKNOWNMODE:
 			message = c + " :is unknown mode char to me for " + channelName;
 			break ;
+		case ERR_INVITEONLYCHAN:
+			message = channelName + " :Cannot join channel (+i)";
+			break;
 		default:
 			message = ":default message";
 			break ;

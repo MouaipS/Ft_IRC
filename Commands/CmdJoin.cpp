@@ -4,14 +4,14 @@
 
 CmdJoin::CmdJoin() : ICommand::ICommand() {};
 
-static int	alreadyOnChannel(User* user, std::vector<User*> allUsers) {
+static bool	alreadyOnChannel(User* user, std::vector<User*> allUsers) {
 
 	for (size_t i = 0; i < allUsers.size(); i++) {
 
 		if (user->getNickname() == allUsers[i]->getNickname())
-			return 1;
+			return true;
 	}
-	return 0;
+	return false;
 }
 
 static Channel *findChannel(std::vector<Channel*>& allChannels, std::string name) {
@@ -52,6 +52,16 @@ static std::vector<std::string>	splitArgs(std::string chanToJoin) {
 	return (cmd);
 }
 
+
+static bool findGuest(User *user, Channel* channel){
+	std::vector<User *>::iterator it = channel->getGuestList().begin();
+	for(; it != channel->getGuestList().end(); it++) {
+		if(user->getUsername() == (*it)->getUsername())
+			return true;
+	}
+	return false;
+}
+
 void CmdJoin::execCmd(
 		int fd_origin,
 		std::vector<std::string>& cmd,
@@ -59,9 +69,8 @@ void CmdJoin::execCmd(
 		std::vector<Channel*>& allChannels, 
 		std::map<int, User*>& fdToUser )
 {
-
-	(void) password;
-	User*							user = fdToUser[fd_origin];
+	(void)	password;
+	User*	user = fdToUser[fd_origin];
 
 	if (!isUserValidAuth(*user, 1, 1, 1))
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
@@ -99,6 +108,15 @@ void CmdJoin::execCmd(
 					{
 						if (passwords[j] != (*it)->getKey())
 							throw ExceptionCode(ERR_PASSWDMISMATCH);
+					}
+					if((*it)->getIsInviteOnly()){
+						if(!findGuest(user, (*it)))
+							throw ExceptionCode(ERR_INVITEONLYCHAN, "", (*it)->getName());
+						std::vector<User*> guests = (*it)->getGuestList();
+						(*it)->getGuestList().erase(std::remove(guests.begin(), guests.end(), user), guests.end());
+					} else if(findGuest(user, (*it))) {
+						std::vector<User*> guests = (*it)->getGuestList();
+						(*it)->getGuestList().erase(std::remove(guests.begin(), guests.end(), user), guests.end());
 					}
 					serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
 					Channel *channel = findChannel(allChannels, chanToJoin[j]);
