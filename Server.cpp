@@ -99,7 +99,10 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("INVITE", new CmdInvite()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("see", new Cmdsee()));
+	_commands.insert(std::make_pair("SEE", new Cmdsee()));
+	if (!_commands.begin()->second)
+		throw InitCommandFail();
+	_commands.insert(std::make_pair("PART", new CmdPart()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 }
