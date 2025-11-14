@@ -20,6 +20,7 @@ enum ErrorCode {
 	ERR_NEEDMOREPARAMS = 461,
 	ERR_ALREADYREGISTRED = 462,
 	ERR_PASSWDMISMATCH = 464,
+	ERR_UNKNOWNMODE = 472,
 	ERR_CHANOPRIVSNEEDED = 482
 };
 
@@ -27,6 +28,7 @@ class ExceptionCode: public std::exception
 {
 	public:
 		ExceptionCode(ErrorCode id) throw();
+		ExceptionCode(ErrorCode id, std::string c, std::string channelName) throw();
 		virtual ~ExceptionCode() throw();
 
 		const char* what() const throw();

@@ -14,21 +14,20 @@ static Channel *findChannel(std::string channel, std::vector<Channel*>& allChann
 	return 0;
 }
 
-void CmdMode::execCmd(
+void CmdMode::execCmd(  //on a: MODE <modes> <channel>, au lieu de: MODE <channel> <modes>   on a 0 1 2 et faut 0 2 1
     int fd_origin,
     std::vector<std::string>& cmd,
     const std::string& password,
     std::vector<Channel*>& allChannels,
     std::map<int, User*>& fdToUser
 ) {
-
     Channel *channel;
     User *user = fdToUser[fd_origin];
     if (!isUserValidAuth(*user, 1,1,1))
 		throw ExceptionCode(ERR_NOTREGISTERED);
-    if (cmd.size() < 3 || cmd[2].empty())
+    if (cmd.size() < 3 || cmd[1].empty() || cmd[2].empty())
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
-    channel = findChannel(cmd[2], allChannels);
+    channel = findChannel(cmd[1], allChannels);
 	if (!channel)
 		throw ExceptionCode(ERR_NOSUCHCHANNEL);
     if (channel->findUser(*user) == -1) {
@@ -41,7 +40,7 @@ void CmdMode::execCmd(
 	int selectLevel = 11;
 	
 	for(int i = 0; i < 10 ; i++) {
-		if(cmd[1] == level[i]) {
+		if(cmd[2] == level[i]) {
 			selectLevel = i;
 		}
 	}
@@ -80,7 +79,7 @@ void CmdMode::execCmd(
             ModeTm(*channel);
             break;
         default:
-			std::cout << "Please select a correct level !" << std::endl;
+		    throw ExceptionCode(ERR_UNKNOWNMODE, cmd[2], channel->getName());
 	}
 	(void) password;
 }

@@ -63,6 +63,19 @@ ExceptionCode::ExceptionCode(ErrorCode id) throw(): code(id) {
 
 }
 
+ExceptionCode::ExceptionCode(ErrorCode id, std::string c, std::string channelName) throw(): code(id) {
+	switch(code)
+	{
+		case ERR_UNKNOWNMODE:
+			message = c + " :is unknown mode char to me for " + channelName;
+			break ;
+		default:
+			message = ":default message";
+			break ;
+	}
+
+}
+
 ExceptionCode::~ExceptionCode() throw() {}
 
 std::string ExceptionCode::to_string() const{
