@@ -82,6 +82,8 @@ class Server
 		addrinfo			_hints;
 		addrinfo			*_res;
 		int					_sockfd;
+		int					epoll_fd;
+		epoll_event			_events[180];
 
 		// FUNCTIONS
 		void	sendToCommand(std::vector<std::string> cmd, int fd_origin);

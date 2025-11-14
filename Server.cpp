@@ -3,14 +3,32 @@
 #include "Utils.hpp"
 #include <vector>
 
-Server::Server(std::string port, std::string password): _port(port), _password(password) {}
+Server::Server(std::string port, std::string password): _port(port), _password(password) {
+	_sockfd = -1;
+	epoll_fd = -1;
+}
 
 Server::~Server() {
 	
-	std::map<std::string, ICommand*>::iterator it = _commands.begin();
-	for (;it != _commands.end(); ++it)
-		delete it->second;
+	if (_sockfd != -1)
+		close(_sockfd);
+	if (epoll_fd != -1)
+		close(epoll_fd);
+	freeaddrinfo(_res);
+	std::map<int, User*>::iterator	it = _fdToUser.begin();
+	for (; it != _fdToUser.end(); it++) {
+
+		close(it->first);
+		delete (it->second);
+	}
+	for (size_t i = 0; i < _allChannels.size(); i++)
+		delete _allChannels[i];
+
+	std::map<std::string, ICommand*>::iterator ite = _commands.begin();
+	for (;ite != _commands.end(); ++ite)
+		delete ite->second;
 }
+
 
 // F U N C T I O N S
 
@@ -111,20 +129,14 @@ void	Server::initServer(std::string port) {
 		throw GetAddrInfoFail();
 
 	_sockfd = socket(_res->ai_family, _res->ai_socktype, _res->ai_protocol);
-	if (_sockfd == -1) {
-		freeaddrinfo(_res);
+	if (_sockfd == -1)
 		throw SocketFail();
-	}
 	
-	else if (bind(_sockfd, _res->ai_addr, _res->ai_addrlen) == -1) {
-		freeaddrinfo(_res);
+	else if (bind(_sockfd, _res->ai_addr, _res->ai_addrlen) == -1)
 		throw BindFail();
-	}
 
-	else if (listen(_sockfd, 10) == -1) {
-		freeaddrinfo(_res);
+	else if (listen(_sockfd, 10) == -1)
 		throw ListenFail();
-	}
 }
 
 User*	Server::getUser(int fd)
@@ -234,25 +246,24 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
  *
  * @note This loop runs indefinitely until the process is stopped.
  */
+
 void	Server::epollServer()
 {
-	int	epoll_fd = epoll_create(1);
+	epoll_fd = epoll_create(1);
 
-	epoll_event dataEpoll, events[180];
+	epoll_event dataEpoll; //, events[180];
 	dataEpoll.events = EPOLLIN;
 	dataEpoll.data.fd = _sockfd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, _sockfd, &dataEpoll);
 
 	while (sigStatus)
 	{
-		int nb_event = epoll_wait(epoll_fd, events, 180, 10);
+		int nb_event = epoll_wait(epoll_fd, _events, 180, 10);
 		if (nb_event == -1)
 			continue ;
 
 		for (int i = 0; i < nb_event; i++)
-			handle_event(events[i], dataEpoll, epoll_fd);
-		if (!sigStatus)
-			return ;
+			handle_event(_events[i], dataEpoll, epoll_fd);
 	}
 }
 
@@ -283,6 +294,7 @@ void	Server::updateUserBuffer(int fd_actif, User* user) {
 	{
 		delete user;
 		_fdToUser.erase(fd_actif);
+		close(fd_actif);
 		return ;
 	}
 
