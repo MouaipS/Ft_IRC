@@ -28,29 +28,40 @@ CXXFLAGS = -g -Wall -Wextra -Werror -std=c++98 -I./ -ICommands/
 
 CXX = c++
 
+ORANGE = \033[38;5;208m
+RED    = \033[31m
+GREEN  = \033[32m
+RESET  = \033[0m
+
 #-----------------------------------------#
 
 all: $(NAME)
+	@echo "$(GREEN)Done!$(RESET)"
 
 $(NAME): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
 
 $(OBJDIR)/%.o: %.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@if echo "$<" | grep -q "^Commands/"; then \
+		echo "$(RED)Commands compiling : $<$(RESET)"; \
+	else \
+		echo "$(ORANGE)Server compiling : $<$(RESET)"; \
+	fi
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR) $(OBJDIR)/Commands
+	@mkdir -p $(OBJDIR) $(OBJDIR)/Commands
 
 run: all
-	./ircserv 6667 oui
-	./ircserv 6668 oui
+	@./ircserv 6667 oui
+	@./ircserv 6668 oui
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 clean:
-	rm -rf $(OBJDIR)
+	@rm -rf $(OBJDIR)
 
 re: fclean all
 
-.PHOONY: re fclean clean all
+.PHOONY: re fclean clean all done

@@ -34,7 +34,7 @@ void CmdPart::execCmd(
     int fd_origin, std::vector<std::string>& cmd, const std::string& password,
     std::vector<Channel*>& allChannels,std::map<int, User*>& fdToUser)
 {
-
+	(void)password;
 
 
 	 ///PART channel , channel, channel, 'Part message'
