@@ -43,18 +43,18 @@ static std::vector<std::string> parseChannel(const std::vector<std::string>& cmd
     return result;
 }
 
-
+void sendUsers(std::vector<User *> users, Channel *channel, User *user) {
+	std::vector<User *>::iterator it = users.begin();
+	for(; it != users.end(); it++) {
+		serverReply((*it)->getFd(), user->getUsername() + " " + channel->getName(), 0);
+	}
+}
 
 void CmdPart::execCmd(
     int fd_origin, std::vector<std::string>& cmd, const std::string& password,
     std::vector<Channel*>& allChannels,std::map<int, User*>& fdToUser)
 {
 	(void)password;
-
-
-	 ///PART channel , channel, channel, 'Part message'
-
-
 	User *user = fdToUser[fd_origin];
 	if (!isUserValidAuth(*user, 1,1,1))
 		throw ExceptionCode(ERR_NOTREGISTERED);
@@ -67,7 +67,6 @@ void CmdPart::execCmd(
 	for(; it != channels.end();it++)
 	{
 		Channel *channel;
-		std::cout <<"i = "<< i << " Nom du channel :" << (*it) <<std::endl;
 		channel = findChannel((*it), allChannels);
 		if (!channel)
 			throw ExceptionCode(ERR_NOSUCHCHANNEL);
@@ -76,7 +75,6 @@ void CmdPart::execCmd(
 			throw ExceptionCode(ERR_NOTONCHANNEL);
 		}
 		channel->removeUserFromChannel(*user);
+		sendUsers(channel->getUsers(), channel, user);
 	}
-
-
 }

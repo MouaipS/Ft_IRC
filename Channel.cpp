@@ -137,7 +137,6 @@ void	Channel::deleteUser(User* user) {
  */
 int Channel::findUser(User& user)
 {
-	std::cout << user.getUsername() << std::endl;
 	for (size_t i = 0; i < _users.size(); ++i)
 	{
 		if (&user == _users[i])
