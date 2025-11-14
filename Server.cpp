@@ -235,9 +235,24 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		std::cout << args[0] << std::endl;
 		sendToCommand(args, fd_actif);
 		userBuffer.clear();
+		cleanChannel();
 	} 
 	else if (userBuffer.size() > 510)
 		handleBufferTooLong(fd_actif, user, userBuffer);
+}
+
+
+void Server::cleanChannel() {
+    for (std::vector<Channel*>::iterator it = _allChannels.begin(); it != _allChannels.end(); ) {
+        Channel* channel = *it;
+
+        if (channel && channel->getUsers().empty()) {
+            delete channel;
+            it = _allChannels.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 /**
@@ -266,7 +281,10 @@ void	Server::epollServer()
 			continue ;
 
 		for (int i = 0; i < nb_event; i++)
+		{
+			cleanChannel();
 			handle_event(_events[i], dataEpoll, epoll_fd);
+		}
 	}
 }
 

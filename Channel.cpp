@@ -10,10 +10,7 @@ Channel::Channel(std::string name) : _name(name)
 	_userLimit = 100;
 }
 
-Channel::~Channel()
-{
-	std::cout << "Channel " << _name << " has been destroyed." << std::endl;
-}
+Channel::~Channel() {}
 
 // ------------- GET  ------------- //
 std::string Channel::getName() const

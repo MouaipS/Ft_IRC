@@ -95,4 +95,5 @@ class Server
 		User*	getUser(int fd);
 		bool isBufferReady(std::string& buffer);
 		void handleBufferTooLong(int fd, User *user, std::string& buffer);
+		void cleanChannel();
 };
