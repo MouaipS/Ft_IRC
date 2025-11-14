@@ -4,6 +4,29 @@
 
 CmdMode::CmdMode() : ICommand::ICommand() {};
 
+static std::vector<std::string> parseFlags(const std::string& flags)
+{
+    std::vector<std::string> result;
+    char currentSign = '+';
+
+    for (size_t i = 0; i < flags.size(); ++i)
+    {
+        char c = flags[i];
+        if (c == '+' || c == '-') {
+            currentSign = c;
+            continue;
+        }
+        if (std::isalpha(c)) {
+            std::string token;
+            token += currentSign;
+            token += c;
+            result.push_back(token);
+        }
+    }
+    return result;
+}
+
+
 static Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels) {
 
     std::vector<Channel*>::iterator it = allChannels.begin();
@@ -14,7 +37,7 @@ static Channel *findChannel(std::string channel, std::vector<Channel*>& allChann
 	return 0;
 }
 
-void CmdMode::execCmd(  //on a: MODE <modes> <channel>, au lieu de: MODE <channel> <modes>   on a 0 1 2 et faut 0 2 1
+void CmdMode::execCmd(  
     int fd_origin,
     std::vector<std::string>& cmd,
     const std::string& password,
@@ -35,51 +58,62 @@ void CmdMode::execCmd(  //on a: MODE <modes> <channel>, au lieu de: MODE <channe
     } else if (channel->findOperator(*user) == -1) {
 		throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
     }
-
+    std::vector<std::string> flags = parseFlags(cmd[2]);
+    std::vector<std::string>::iterator it = flags.begin();
     const std::string level[10] = {"+i","-i","+k","-k","+l","-l","+o","-o","+t","-t"};
-	int selectLevel = 11;
-	
-	for(int i = 0; i < 10 ; i++) {
-		if(cmd[2] == level[i]) {
-			selectLevel = i;
-		}
-	}
-	switch (selectLevel) {
-        case 0:
-            ModeIp(*channel);
-			break;
-        case 1:
-            ModeIm(*channel);
-            break;
-        case 2:
-            if(cmd.size() >= 4 && (!cmd[3].empty()))
-                ModeKp(*channel, cmd[3]);
-			break;
-        case 3:
-                ModeKm(*channel);
-            break;
-        case 4:
-           if(cmd.size() >= 4 && (!cmd[3].empty()))
-                ModeLp(*channel, cmd[3]);
-			break;
-        case 5:
-            ModeLm(*channel);
-            break;
-        case 6:
-            if(cmd.size() >= 4 && (!cmd[3].empty()))
-                ModeOp(*channel, cmd[3]);
-            break;
-        case 7:
-            ModeOm(*channel, cmd[3]);
-            break;
-        case 8:
-            ModeTp(*channel);
-            break;
-        case 9:
-            ModeTm(*channel);
-            break;
-        default:
-		    throw ExceptionCode(ERR_UNKNOWNMODE, cmd[2], channel->getName());
-	}
+	for(; it != flags.end();it++){
+        int selectLevel = 11;
+        for(int i = 0; i < 10 ; i++) {
+	    	if(*it == level[i]) {
+	    		selectLevel = i;
+	    	}
+	    }
+	    switch (selectLevel) {
+            case 0:
+                ModeIp(*channel);
+	    		break;
+            case 1:
+                ModeIm(*channel);
+                break;
+            case 2:
+                if(cmd.size() >= 4 && (!cmd[3].empty()))
+                    ModeKp(*channel, cmd[3]);
+                else
+                    throw ExceptionCode(ERR_NEEDMOREPARAMS);
+	    		break;
+            case 3:
+                    ModeKm(*channel);
+                break;
+            case 4:
+               if(cmd.size() >= 4 && (!cmd[3].empty()))
+                    ModeLp(*channel, cmd[3]);
+                else
+                    throw ExceptionCode(ERR_NEEDMOREPARAMS);
+	    		break;
+            case 5:
+                ModeLm(*channel);
+                break;
+            case 6:
+                if(cmd.size() >= 4 && (!cmd[3].empty()))
+                    ModeOp(*channel, cmd[3]);
+                else
+                    throw ExceptionCode(ERR_NEEDMOREPARAMS);
+                break;
+            case 7:
+                if(cmd.size() >= 4 && (!cmd[3].empty()))
+                    ModeOm(*channel, cmd[3]);
+                else
+                    throw ExceptionCode(ERR_NEEDMOREPARAMS);
+                break;
+            case 8:
+                ModeTp(*channel);
+                break;
+            case 9:
+                ModeTm(*channel);
+                break;
+            default:
+	    	    throw ExceptionCode(ERR_UNKNOWNMODE, *it, channel->getName());
+	    }
+    }
 	(void) password;
 }
