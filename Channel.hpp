@@ -21,7 +21,7 @@ class Channel {
 		bool				getIsKeyProtected() const;
 		bool				getIsLimit() const;
 		size_t				getUserLimit() const;
-		std::vector<User*>	getGuestList() const;
+		std::vector<User*>&	getGuestList() ;
 		
 		// SET
 

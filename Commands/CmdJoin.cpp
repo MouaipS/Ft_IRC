@@ -54,8 +54,9 @@ static std::vector<std::string>	splitArgs(std::string chanToJoin) {
 
 
 static bool findGuest(User *user, Channel* channel){
-	std::vector<User *>::iterator it = channel->getGuestList().begin();
-	for(; it != channel->getGuestList().end(); it++) {
+	const std::vector<User *>& guestlist = channel->getGuestList();
+	std::vector<User *>::const_iterator it = guestlist.begin();
+	for(; it != guestlist.end(); it++) {
 		if(user->getUsername() == (*it)->getUsername())
 			return true;
 	}
@@ -115,8 +116,8 @@ void CmdJoin::execCmd(
 						std::vector<User*> guests = (*it)->getGuestList();
 						(*it)->getGuestList().erase(std::remove(guests.begin(), guests.end(), user), guests.end());
 					} else if(findGuest(user, (*it))) {
-						std::vector<User*> guests = (*it)->getGuestList();
-						(*it)->getGuestList().erase(std::remove(guests.begin(), guests.end(), user), guests.end());
+					std::vector<User*>& guests = (*it)->getGuestList();
+					guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
 					}
 					serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
 					Channel *channel = findChannel(allChannels, chanToJoin[j]);

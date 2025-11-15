@@ -63,7 +63,7 @@ size_t Channel::getUserLimit() const
     return _userLimit;
 }
 
-std::vector<User*> Channel::getGuestList() const{
+std::vector<User*>& Channel::getGuestList() {
 	return _guestlist;
 }
 
