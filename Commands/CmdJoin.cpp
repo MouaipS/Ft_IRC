@@ -117,8 +117,8 @@ void CmdJoin::execCmd(
 					if((*it)->getIsInviteOnly()){
 						if(!findGuest(user, (*it)))
 							throw ExceptionCode(ERR_INVITEONLYCHAN, "", (*it)->getName());
-						std::vector<User*> guests = (*it)->getGuestList();
-						(*it)->getGuestList().erase(std::remove(guests.begin(), guests.end(), user), guests.end());
+						std::vector<User*>& guests = (*it)->getGuestList();
+						guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
 					} else if(findGuest(user, (*it))) {
 					std::vector<User*>& guests = (*it)->getGuestList();
 					guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
