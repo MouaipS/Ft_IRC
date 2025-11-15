@@ -105,6 +105,10 @@ void CmdJoin::execCmd(
 						throw ExceptionCode(ERR_USERONCHANNEL);
 				else
 				{
+					if ((*it)->getIsLimit()){
+						if((*it)->getUsers().size() >= (*it)->getUserLimit())
+							throw ExceptionCode(ERR_CHANNELISFULL, "", (*it)->getName());
+					}
 					if ((*it)->getIsKeyProtected())
 					{
 						if (passwords[j] != (*it)->getKey())

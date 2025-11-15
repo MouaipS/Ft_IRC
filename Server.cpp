@@ -241,7 +241,6 @@ void	Server::handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd
 		handleBufferTooLong(fd_actif, user, userBuffer);
 }
 
-
 void Server::cleanChannel() {
     for (std::vector<Channel*>::iterator it = _allChannels.begin(); it != _allChannels.end(); ) {
         Channel* channel = *it;
