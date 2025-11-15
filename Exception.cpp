@@ -72,6 +72,8 @@ ExceptionCode::ExceptionCode(ErrorCode id, std::string c, std::string channelNam
 		case ERR_INVITEONLYCHAN:
 			message = channelName + " :Cannot join channel (+i)";
 			break;
+		case ERR_CHANNELISFULL:
+			message = channelName + " :Cannot join channel (+i)";
 		default:
 			message = ":default message";
 			break ;
