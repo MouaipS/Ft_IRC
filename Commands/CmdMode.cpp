@@ -25,7 +25,12 @@ static std::vector<std::string> parseFlags(const std::string& flags)
     }
     return result;
 }
-
+void CmdMode::sendUsers(std::vector<User *> users, Channel *channel, std::string mode) {
+	std::vector<User *>::iterator it = users.begin();
+	for(; it != users.end(); it++) {
+		serverReply((*it)->getFd(),  "MODE "+ channel->getName() + mode, 0);
+	}
+}
 
 static Channel *findChannel(std::string channel, std::vector<Channel*>& allChannels) {
 
@@ -71,27 +76,35 @@ void CmdMode::execCmd(
 	    switch (selectLevel) {
             case 0:
                 ModeIp(*channel);
+                sendUsers(channel->getUsers(), channel, " +i");
 	    		break;
             case 1:
                 ModeIm(*channel);
+                sendUsers(channel->getUsers(), channel, " -i");
                 break;
             case 2:
-                if(cmd.size() >= 4 && (!cmd[3].empty()))
+                if(cmd.size() >= 4 && (!cmd[3].empty())){
                     ModeKp(*channel, cmd[3]);
+                    sendUsers(channel->getUsers(), channel, " +k " + cmd[3]);
+                }
                 else
                     throw ExceptionCode(ERR_NEEDMOREPARAMS);
 	    		break;
             case 3:
-                    ModeKm(*channel);
+                ModeKm(*channel);
+                sendUsers(channel->getUsers(), channel, " -k");
                 break;
             case 4:
-               if(cmd.size() >= 4 && (!cmd[3].empty()))
+               if(cmd.size() >= 4 && (!cmd[3].empty())){
                     ModeLp(*channel, cmd[3]);
+                    sendUsers(channel->getUsers(), channel, " +l " + cmd[3]);
+               }
                 else
                     throw ExceptionCode(ERR_NEEDMOREPARAMS);
 	    		break;
             case 5:
                 ModeLm(*channel);
+                sendUsers(channel->getUsers(), channel, " -l");
                 break;
             case 6:
                 if(cmd.size() >= 4 && (!cmd[3].empty()))
@@ -107,9 +120,11 @@ void CmdMode::execCmd(
                 break;
             case 8:
                 ModeTp(*channel);
+                sendUsers(channel->getUsers(), channel, " +t ");
                 break;
             case 9:
                 ModeTm(*channel);
+                sendUsers(channel->getUsers(), channel, " -t ");
                 break;
             default:
 	    	    throw ExceptionCode(ERR_UNKNOWNMODE, *it, channel->getName());

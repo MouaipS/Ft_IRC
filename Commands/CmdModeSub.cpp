@@ -66,11 +66,11 @@ void CmdMode::ModeOp(Channel &channel, std::string target){
 		throw ExceptionCode(ERR_USERNOTINCHANNEL);
 	}
 	if(channel.findOperator(*userTarget) != -1){
-		serverReply(userTarget->getFd(), "MODE " + channel.getName() + " +o " + userTarget->getUsername(), 0);
+		sendUsers(channel.getUsers(), &channel, " +o "+ userTarget->getUsername());
 		return;
 	}
 	channel.promoteUser(*userTarget);
-	serverReply(userTarget->getFd(), "MODE " + channel.getName() + " +o " + userTarget->getUsername(), 0);
+	sendUsers(channel.getUsers(), &channel, " +o "+ userTarget->getUsername());
 }
 
 void CmdMode::ModeOm(Channel &channel, std::string target){
@@ -80,11 +80,11 @@ void CmdMode::ModeOm(Channel &channel, std::string target){
 		throw ExceptionCode(ERR_USERNOTINCHANNEL);
 	}
 	if(channel.findOperator(*userTarget) == -1){
-		serverReply(userTarget->getFd(), "MODE " + channel.getName() + " -o " + userTarget->getUsername(), 0);
+		sendUsers(channel.getUsers(), &channel, " -o "+ userTarget->getUsername());
 		return;
 	}
 	channel.demoteUser(*userTarget);
-	serverReply(userTarget->getFd(), "MODE " + channel.getName() + " -o " + userTarget->getUsername(), 0);
+	sendUsers(channel.getUsers(), &channel, " -o "+ userTarget->getUsername());
 }
 
 void CmdMode::ModeTp(Channel &channel){

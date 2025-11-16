@@ -13,8 +13,8 @@ class CmdMode : public ICommand {
         );
     private:
         void ModeOp(Channel &channel, std::string target);
-        void ModeOm(Channel &channel, std::string target);
         void ModeIp(Channel &channel);
+        void ModeOm(Channel &channel, std::string target);
         void ModeIm(Channel &channel);
         void ModeLp(Channel &channel, std::string limit);
         void ModeLm(Channel &channel);
@@ -22,4 +22,5 @@ class CmdMode : public ICommand {
         void ModeKm(Channel &channel);
         void ModeTp(Channel &channel);
         void ModeTm(Channel &channel);
+        void sendUsers(std::vector<User *> users, Channel *channel, std::string mode);
 };

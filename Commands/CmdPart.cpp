@@ -46,7 +46,7 @@ static std::vector<std::string> parseChannel(const std::vector<std::string>& cmd
 void sendUsers(std::vector<User *> users, Channel *channel, User *user) {
 	std::vector<User *>::iterator it = users.begin();
 	for(; it != users.end(); it++) {
-		serverReply((*it)->getFd(), user->getUsername() + " " + channel->getName(), 0);
+		serverReply((*it)->getFd(), user->getUsername() + " PART " + channel->getName(), 0);
 	}
 }
 
