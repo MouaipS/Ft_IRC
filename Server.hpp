@@ -93,7 +93,7 @@ class Server
 		void	updateUserBuffer(int fd_actif, User* user);
 		void	handle_event(epoll_event event, epoll_event dataEpoll, int epoll_fd);
 		User*	getUser(int fd);
-		bool isBufferReady(std::string& buffer);
-		void handleBufferTooLong(int fd, User *user, std::string& buffer);
-		void cleanChannel();
+		bool 	isBufferReady(std::string& buffer);
+		void 	handleBufferTooLong(int fd, User *user, std::string& buffer);
+		void 	cleanChannel();
 };

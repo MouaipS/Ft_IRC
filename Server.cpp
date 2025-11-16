@@ -312,6 +312,12 @@ void	Server::updateUserBuffer(int fd_actif, User* user) {
 
 	if (rcvBytes == 0)
 	{
+		std::vector<Channel *>::iterator it = _allChannels.begin();
+		int i=-1;
+		for(; it != _allChannels.end(); it++){
+			i++;
+			(*it)->deleteUser(user);
+		}
 		delete user;
 		_fdToUser.erase(fd_actif);
 		close(fd_actif);

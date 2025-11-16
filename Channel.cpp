@@ -113,14 +113,21 @@ void	Channel::setNewUser(User* user) {
 void	Channel::deleteUser(User* user) {
 
 	std::vector<User*>::iterator	it = _users.begin();
+	std::vector<User*>::iterator	itt = _operators.begin();
 
 	for (; it != _users.end(); it++) {
-
-		if (user->getUsername() == (*it)->getUsername())
+		if (user->getUsername() == (*it)->getUsername()){
+			for(; itt != _operators.end(); itt++){
+				if (user->getUsername() == (*itt)->getUsername()){
+					_operators.erase(itt);
+					break;
+				}
+			}
 			_users.erase(it);
+			break;
+		}
 	}
 }
-
 
 // ------------- UTILS  ------------- //
 
