@@ -43,10 +43,10 @@ static std::vector<std::string> parseChannel(const std::vector<std::string>& cmd
     return result;
 }
 
-void sendUsers(std::vector<User *> users, Channel *channel, User *user) {
+void sendUsers(std::vector<User *> users, Channel *channel, User *user, std::string reason) {
 	std::vector<User *>::iterator it = users.begin();
 	for(; it != users.end(); it++) {
-		serverReply((*it)->getFd(), user->getUsername() + " PART " + channel->getName(), 0);
+		serverReply((*it)->getFd(), user->getUsername() + " PART " + channel->getName() + reason, 0);
 	}
 }
 
@@ -60,6 +60,10 @@ void CmdPart::execCmd(
 		throw ExceptionCode(ERR_NOTREGISTERED);
 	if (cmd.size() <= 1)
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
+	std::string reason = " : No particular reason";
+	if(cmd.size() == 3 ){
+		std::string reason = " : " + cmd[2]; 
+	}
 	
 	std::vector<std::string> channels = parseChannel(cmd);
 	std::vector<std::string>::iterator it = channels.begin();
@@ -75,6 +79,6 @@ void CmdPart::execCmd(
 			throw ExceptionCode(ERR_NOTONCHANNEL);
 		}
 		channel->removeUserFromChannel(*user);
-		sendUsers(channel->getUsers(), channel, user);
+		sendUsers(channel->getUsers(), channel, user, reason);
 	}
 }
