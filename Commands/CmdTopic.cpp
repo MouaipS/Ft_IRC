@@ -23,6 +23,9 @@ void CmdTopic::execCmd(
 
 		if (cmd[1] == allChannels[i]->getName()) {
 
+			if (allChannels[i]->findOperator(*user) == -1)
+				throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
+
 			if (cmd.size() == 2) {
 				clientReply(fd_origin, user->getNickname(), user->getUsername(), "TOPIC", cmd[1], allChannels[i]->getTopic(), 0);
 				return ;

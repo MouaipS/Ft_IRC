@@ -6,6 +6,7 @@
 Server::Server(std::string port, std::string password): _port(port), _password(password) {
 	_sockfd = -1;
 	epoll_fd = -1;
+	_timeOfDay = displayTimestamp();
 }
 
 Server::~Server() {
@@ -84,7 +85,7 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("PASS", new CmdPass()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
-	_commands.insert(std::make_pair("NICK", new CmdNick()));
+	_commands.insert(std::make_pair("NICK", new CmdNick(_timeOfDay)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 	_commands.insert(std::make_pair("MODE", new CmdMode()));

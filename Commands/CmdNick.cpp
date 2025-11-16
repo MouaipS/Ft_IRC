@@ -3,6 +3,7 @@
 #include "Utils.hpp"
 
 CmdNick::CmdNick() : ICommand::ICommand() {};
+CmdNick::CmdNick(std::string time) : ICommand::ICommand(), _timeOfDay(time) {};
 
 static bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*>& fdToUser) {
     if(user->isNicknameValid(CorrectNick) == true) {
@@ -35,6 +36,9 @@ void CmdNick::execCmd(
         user->setNickname(cmd[1]);
 		user->setFd(fd_origin);
         serverReply(fd_origin, "001 " + CorrectNick + " :Welcome to the IRC Network", 0);
+        serverReply(fd_origin, "002 " + CorrectNick + " :Your host is " + getServerName() + " running version InspIRCd v4", 0);
+        serverReply(fd_origin, "003 " + CorrectNick + " :This server was created " + _timeOfDay, 0);
+        serverReply(fd_origin, "004 " + CorrectNick + " :" + getServerName() + " InspIRCD v4 itkol", 0);
     }
     else {user->setNickname(cmd[1]);}
 }
