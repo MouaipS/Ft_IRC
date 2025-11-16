@@ -114,6 +114,7 @@ void	Channel::deleteUser(User* user) {
 
 	std::vector<User*>::iterator	it = _users.begin();
 	std::vector<User*>::iterator	itt = _operators.begin();
+	std::vector<User*>::iterator	ittt = _guestlist.begin();
 
 	for (; it != _users.end(); it++) {
 		if (user->getUsername() == (*it)->getUsername()){
@@ -124,6 +125,12 @@ void	Channel::deleteUser(User* user) {
 				}
 			}
 			_users.erase(it);
+			break;
+		}
+	}
+	for(; ittt != _guestlist.end(); ittt++){
+		if (user->getUsername() == (*ittt)->getUsername()){
+			_guestlist.erase(ittt);
 			break;
 		}
 	}
