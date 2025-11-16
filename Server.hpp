@@ -80,6 +80,7 @@ class Server
 		std::map<int, User*>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
 
+		std::string			_timeOfDay;
 		addrinfo			_hints;
 		addrinfo			*_res;
 		int					_sockfd;
