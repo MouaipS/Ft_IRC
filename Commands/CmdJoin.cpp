@@ -66,14 +66,8 @@ static bool findGuest(User *user, Channel* channel){
 static void sendUsers(std::vector<User *> users, Channel *channel, std::string name) {
 	std::vector<User *>::iterator it = users.begin();
 	for(; it != users.end(); it++) {
-		serverReply((*it)->getFd(), "353 = " + channel->getName() + " :" + name, 0);
-	}
-}
-
-static void sendJoinReply(std::vector<User *> users, Channel *channel) {
-	std::vector<User *>::iterator it = users.begin();
-	for(; it != users.end(); it++) {
-		serverReply((*it)->getFd(), "JOIN " + channel->getName(), 0);
+		serverReply((*it)->getFd(), "353 " + (*it)->getUsername() + " = " + channel->getName() + " :" + name, 0);
+		serverReply((*it)->getFd(), "366 " + (*it)->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
 	}
 }
 
@@ -137,10 +131,10 @@ void CmdJoin::execCmd(
 					std::vector<User*>& guests = (*it)->getGuestList();
 					guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
 					}
-					serverReply(fd_origin, "JOIN " + chanToJoin[j], 0);
+					clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", cmd[1], ":oui", 0);
 					Channel *channel = findChannel(allChannels, chanToJoin[j]);
 					channel->setNewUser(user);
-					serverReply(fd_origin, "332 = " + chanToJoin[j] + " :" + channel->getTopic(), 0);
+					serverReply(fd_origin, "332 " + user->getUsername() + " " + chanToJoin[j] + " :" + channel->getTopic(), 0);
 					
 					std::string	tmp;
 					for (size_t i = 0; i < channel->getUsers().size(); i++) {
@@ -160,7 +154,7 @@ void CmdJoin::execCmd(
 		Channel *channel = findChannel(allChannels, chanToJoin[j]);
 		channel->setNewUser(user);
 		channel->promoteUser(*user);
-		sendJoinReply(channel->getUsers(), channel);
+		clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0);
 		sendUsers(channel->getUsers(), channel, user->getNickname());
 	}
 }
