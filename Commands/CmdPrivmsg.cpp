@@ -46,7 +46,10 @@ void CmdPrivmsg::execCmd(
 				// send the message to all of the users on the channel
 				std::vector<User*>	myUser = allChannels[i]->getUsers();
 				for (size_t j = 0; j < myUser.size(); j++)
-					clientReply(myUser[j]->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
+				{
+					if (fd_origin != myUser[j]->getFd())
+						clientReply(myUser[j]->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
+				}
 				return ;
 			}
 			// otherwise he can't send the message
