@@ -40,6 +40,8 @@ void CmdInvite::execCmd(
     try{
         channel = findChannel(cmd[2], allChannels);
     }catch(std::exception& e){ throw ExceptionCode(ERR_NOSUCHCHANNEL);}
+    if(channel->findUser(*user) == -1)
+        throw ExceptionCode(ERR_NOTONCHANNEL);
     try{
         target = findTarget(cmd[1], fdToUser);
     }catch(std::exception& e){throw ExceptionCode(ERR_NOSUCHNICK);}
