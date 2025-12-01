@@ -20,7 +20,7 @@ bool isValidLimit(const std::string &str, int &out)
             return false;
     }
 
-    if (result <= 1)
+    if (result < 1)
         return false;
     out = static_cast<int>(result);
     return true;

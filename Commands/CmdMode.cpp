@@ -95,10 +95,10 @@ void CmdMode::execCmd(
                 sendUsers(channel->getUsers(), channel, " -k");
                 break;
             case 4:
-               if(cmd.size() >= 4 && (!cmd[3].empty())){
+               if(cmd.size() >= 4){
                     ModeLp(*channel, cmd[3]);
                     sendUsers(channel->getUsers(), channel, " +l " + cmd[3]);
-               }
+                }
                 else
                     throw ExceptionCode(ERR_NEEDMOREPARAMS);
 	    		break;

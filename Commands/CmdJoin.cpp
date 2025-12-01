@@ -119,7 +119,7 @@ void CmdJoin::execCmd(
 					}
 					if ((*it)->getIsKeyProtected())
 					{
-						if (passwords[j] != (*it)->getKey())
+						if (passwords[j] != (*it)->getKey()) //SEGFAULT SI PAS DE PASSWORD
 							throw ExceptionCode(ERR_PASSWDMISMATCH);
 					}
 					if((*it)->getIsInviteOnly()){
