@@ -50,13 +50,17 @@ void CmdInvite::execCmd(
     if(channel->getIsInviteOnly() ==  true){
         if(channel->findOperator(*user) != -1){
             channel->addGuest(*target);
-            serverReply(target->getFd(), target->getNickname() + " " + channel->getName(),0);
+            clientReply(target->getFd(), user->getNickname(), user->getUsername(), "INVITE" , target->getNickname() + " " + channel->getName(), "", 0);
+            //serverReply(target->getFd(), target->getNickname() + " " + channel->getName(),0); //LA SOURCE C'EST LE CLIENT NORMALEMENT
+            serverReply(user->getFd(), channel->getName() + " " + target->getNickname(), 0);
         } else{
             throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
         }
         return;
     }
     channel->addGuest(*target);
-    serverReply(target->getFd(), target->getNickname() + " " + channel->getName(),0);
+    clientReply(target->getFd(), user->getNickname(), user->getUsername(), "INVITE" , target->getNickname() + " " + channel->getName(), "", 0);
+    //serverReply(target->getFd(), target->getNickname() + " " + channel->getName(),0); //La source c'est le client normalement
+    serverReply(user->getFd(), channel->getName() + " " + target->getNickname(), 0);
 	(void) password;
 }
