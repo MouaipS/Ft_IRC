@@ -35,6 +35,11 @@ static void	leaveAllChannels(std::vector<Channel*>& allChannels, User&	user) {
 			if (allUsers[j]->getNickname() == user.getNickname()) {
 
 				allChannels[i]->removeUserFromChannel(user);
+				std::vector<User*>	users = allChannels[i]->getUsers();
+				std::vector<User *>::iterator it = users.begin();
+				for(; it != users.end(); it++) {
+					clientReply((*it)->getFd(), user.getNickname(), user.getUsername(), "PART", allChannels[i]->getName(), "No particular reason", 0);
+				}
 				break ;
 			}
 		}
