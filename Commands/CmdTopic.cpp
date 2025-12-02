@@ -27,7 +27,10 @@ void CmdTopic::execCmd(
 				throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
 
 			if (cmd.size() == 2) {
-				clientReply(fd_origin, user->getNickname(), user->getUsername(), "TOPIC", cmd[1], allChannels[i]->getTopic(), 0);
+				if(allChannels[i]->getTopic().empty())
+					serverReply(fd_origin, "331 " + user->getNickname() + " " + allChannels[i]->getName() + " :No topic is set",0);
+				else
+					serverReply(fd_origin, "332 " + user->getNickname() + " " + allChannels[i]->getName() + " :" + allChannels[i]->getTopic(),0);
 				return ;
 			}
 			else
@@ -35,6 +38,9 @@ void CmdTopic::execCmd(
 				if (cmd[2].size() == 1 && cmd[2][0] == ':') {
 
 					allChannels[i]->setTopic("");
+					std::vector<User*>	myUser = allChannels[i]->getUsers();
+					for (size_t i = 0; i < myUser.size(); i++)
+						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", allChannels[i]->getName(), "", 0);
 					return ;
 				}
 				else if (cmd[2][0] == ':')
