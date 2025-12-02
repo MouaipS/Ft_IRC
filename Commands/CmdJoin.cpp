@@ -79,6 +79,7 @@ void CmdJoin::execCmd(
 		std::map<int, User*>& fdToUser )
 {
 	(void)	password;
+	bool 	found = false;
 	User*	user = fdToUser[fd_origin];
 
 	if (!isUserValidAuth(*user, 1, 1, 1))
@@ -99,16 +100,19 @@ void CmdJoin::execCmd(
 	}
 
 	std::vector<std::string>	passwords;
-	if (cmd.size() == 3)
+	if (cmd.size() == 3){
 		passwords = splitArgs(cmd[2]);
-
+	}
+	std::vector<Channel*>::iterator	it = allChannels.begin();
 	for (size_t j = 0; j < chanToJoin.size(); j++)
 	{
-		std::vector<Channel*>::iterator	it = allChannels.begin();
+		it = allChannels.begin();
+		found = false;
 		for (; it != allChannels.end(); it++) {
 
 			if ((*it)->getName() == chanToJoin[j])
 			{
+				found = true;
 				if (alreadyOnChannel(user, (*it)->getUsers()))
 						throw ExceptionCode(ERR_USERONCHANNEL);
 				else
@@ -119,7 +123,11 @@ void CmdJoin::execCmd(
 					}
 					if ((*it)->getIsKeyProtected())
 					{
-						if (passwords[j] != (*it)->getKey()) //SEGFAULT SI PAS DE PASSWORD
+						if(cmd.size() < 3)
+							throw ExceptionCode(ERR_BADCHANNELKEY, "", (*it)->getName());
+						else if(j >= passwords.size())
+							throw ExceptionCode(ERR_BADCHANNELKEY, "", (*it)->getName());
+						else if (passwords[j] != (*it)->getKey())
 							throw ExceptionCode(ERR_BADCHANNELKEY, "", (*it)->getName());
 					}
 					if((*it)->getIsInviteOnly()){
@@ -147,16 +155,18 @@ void CmdJoin::execCmd(
 					serverReply(user->getFd(), "353 " + user->getUsername() + " = " + channel->getName() + " :" + tmp, 0);
 					serverReply(user->getFd(), "366 " + user->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
 					sendUsers(channel->getUsers(), channel->getName(), user);
-					return ;
 				}
+				break;
 			}
 		}
-		allChannels.push_back(new Channel(chanToJoin[j]));
-		Channel *channel = findChannel(allChannels, chanToJoin[j]);
-		channel->setNewUser(user);
-		channel->promoteUser(*user);
-		clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0); //oui ?
-		serverReply(user->getFd(), "353 " + user->getUsername() + " = " + channel->getName() + " :" +  user->getNickname(), 0);
-		serverReply(user->getFd(), "366 " + user->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
+		if(found ==  false){
+			allChannels.push_back(new Channel(chanToJoin[j]));
+			Channel *channel = findChannel(allChannels, chanToJoin[j]);
+			channel->setNewUser(user);
+			channel->promoteUser(*user);
+			clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0); //oui ?
+			serverReply(user->getFd(), "353 " + user->getUsername() + " = " + channel->getName() + " :" +  user->getNickname(), 0);
+			serverReply(user->getFd(), "366 " + user->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
+		}
 	}
 }
