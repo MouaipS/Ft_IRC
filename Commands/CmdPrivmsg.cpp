@@ -18,8 +18,10 @@ void CmdPrivmsg::execCmd(
 	// checking the manda security (authorisation and command requested size)
 	if (!isUserValidAuth(*user, 1, 1, 1))
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
-	if (cmd.size() < 3)
+	if (cmd.size() < 3 && cmd[1][0] != ':')
 		throw ExceptionCode(ERR_NOTEXTTOSEND);
+	else if(cmd.size() < 3)
+		throw ExceptionCode(ERR_NOSUCHNICK);
 	if (cmd[2][0] != ':')
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
 		
