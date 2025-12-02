@@ -83,9 +83,12 @@ void CmdMode::execCmd(
                 sendUsers(channel->getUsers(), channel, " -i");
                 break;
             case 2:
-                if(cmd.size() >= 4 && (!cmd[3].empty())){
-                    ModeKp(*channel, cmd[3]);
-                    sendUsers(channel->getUsers(), channel, " +k " + cmd[3]);
+                if(cmd.size() >= 3){
+                    ModeKp(*channel, cmd);
+                    if(cmd.size() == 3)
+                        sendUsers(channel->getUsers(), channel, " +k ");
+                    else
+                        sendUsers(channel->getUsers(), channel, " +k " + cmd[3]);
                 }
                 else
                     throw ExceptionCode(ERR_NEEDMOREPARAMS);

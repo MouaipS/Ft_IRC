@@ -18,7 +18,7 @@ class CmdMode : public ICommand {
         void ModeIm(Channel &channel);
         void ModeLp(Channel &channel, std::string limit);
         void ModeLm(Channel &channel);
-        void ModeKp(Channel &channel, std::string password);
+        void ModeKp(Channel &channel, std::vector<std::string>& cmd);
         void ModeKm(Channel &channel);
         void ModeTp(Channel &channel);
         void ModeTm(Channel &channel);
