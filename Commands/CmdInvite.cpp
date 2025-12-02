@@ -16,7 +16,7 @@ static Channel *findChannel(std::string channel, std::vector<Channel*>& allChann
 static User *findTarget(std::string target, std::map<int, User*>& fdToUser){
     std::map<int, User*> ::iterator it = fdToUser.begin();
     for(;it != fdToUser.end(); it++){
-        if((*it).second->getUsername() == target)
+        if((*it).second->getNickname() == target)
             return((*it).second);
     }
     throw ICommand::UserNotFoundException();
