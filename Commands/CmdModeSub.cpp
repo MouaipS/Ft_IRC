@@ -65,11 +65,11 @@ void CmdMode::ModeLp(Channel &channel, std::string limit){
 
 void CmdMode::ModeOp(Channel &channel, std::string target){
 	User *userTarget;
-	userTarget = channel.findUser(target);
+	userTarget = channel.findNick(target);
 	if(userTarget == NULL) {
 		throw ExceptionCode(ERR_USERNOTINCHANNEL);
 	}
-	if(channel.findOperator(*userTarget) != -1){
+	if(channel.findOperator(*userTarget) != -1){// faire avec le nickname
 		sendUsers(channel.getUsers(), &channel, " +o "+ userTarget->getUsername());
 		return;
 	}
@@ -79,7 +79,7 @@ void CmdMode::ModeOp(Channel &channel, std::string target){
 
 void CmdMode::ModeOm(Channel &channel, std::string target){
 	User *userTarget;
-	userTarget = channel.findUser(target);
+	userTarget = channel.findNick(target);
 	if(userTarget == NULL) {
 		throw ExceptionCode(ERR_USERNOTINCHANNEL);
 	}

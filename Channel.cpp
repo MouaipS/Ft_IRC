@@ -173,6 +173,15 @@ User *Channel::findUser(std::string name) {
 	return(NULL);
 }
 
+User *Channel::findNick(std::string name){
+	std::vector<User*>::iterator it = _users.begin();
+	for(;it != _users.end(); it++){
+		if((*it)->getNickname() == name)
+			return((*it));
+	}
+	return(NULL);
+}
+
 /**
  * @brief Searches for a user in the channel's operator list.
  * 

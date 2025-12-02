@@ -40,6 +40,7 @@ class Channel {
 
 		int		findUser(User& user);
 		User 	*findUser(std::string name);
+		User	*findNick(std::string name);
 		int		findOperator(User& user);
 		void	addUserToChannel(User& user);
 		void	removeUserFromChannel(User& user);
