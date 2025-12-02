@@ -32,6 +32,8 @@ void CmdNick::execCmd(
 		throw ExceptionCode(ERR_NICKNAMEINUSE);
     else if (user->getIsAuthed() == false)
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
+    else if(isUserValidAuth(*user, 1, 1, 1))
+        user->setNickname(cmd[1]);
     else if (isUserValidAuth(*user, 1, 0, 1)) {
         user->setNickname(cmd[1]);
 		user->setFd(fd_origin);
