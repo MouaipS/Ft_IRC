@@ -22,7 +22,8 @@ void CmdTopic::execCmd(
 	for (size_t i = 0; i < allChannels.size(); i++) {
 
 		if (cmd[1] == allChannels[i]->getName()) {
-
+			if(allChannels[i]->findUser(*user) == -1)
+				throw ExceptionCode(ERR_NOTONCHANNEL);
 			if (allChannels[i]->findOperator(*user) == -1)
 				throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
 
