@@ -39,6 +39,7 @@ void CmdMode::ModeKp(Channel &channel, std::vector<std::string>& cmd){
 	if(cmd.size() == 3)
 		channel.setIsKeyProtected(true);
 	else if(cmd.size() >= 4){
+		channel.setIsKeyProtected(true);
 		channel.setKey(cmd[3]);
 	}
 }

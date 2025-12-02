@@ -120,7 +120,7 @@ void CmdJoin::execCmd(
 					if ((*it)->getIsKeyProtected())
 					{
 						if (passwords[j] != (*it)->getKey()) //SEGFAULT SI PAS DE PASSWORD
-							throw ExceptionCode(ERR_PASSWDMISMATCH);
+							throw ExceptionCode(ERR_BADCHANNELKEY, "", (*it)->getName());
 					}
 					if((*it)->getIsInviteOnly()){
 						if(!findGuest(user, (*it)))
@@ -131,7 +131,7 @@ void CmdJoin::execCmd(
 					std::vector<User*>& guests = (*it)->getGuestList();
 					guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
 					}
-					clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", cmd[1], ":oui", 0);
+					clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", cmd[1], ":oui", 0); //oui ?
 					Channel *channel = findChannel(allChannels, chanToJoin[j]);
 					channel->setNewUser(user);
 					serverReply(fd_origin, "332 " + user->getUsername() + " " + chanToJoin[j] + " :" + channel->getTopic(), 0);
@@ -154,7 +154,7 @@ void CmdJoin::execCmd(
 		Channel *channel = findChannel(allChannels, chanToJoin[j]);
 		channel->setNewUser(user);
 		channel->promoteUser(*user);
-		clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0);
+		clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0); //oui ?
 		sendUsers(channel->getUsers(), channel, user->getNickname());
 	}
 }

@@ -75,6 +75,9 @@ ExceptionCode::ExceptionCode(ErrorCode id, std::string c, std::string channelNam
 		case ERR_CHANNELISFULL:
 			message = channelName + " :Cannot join channel (+l)";
 			break;
+		case ERR_BADCHANNELKEY:
+			message = channelName + " :Cannot join channel (+k)";
+			break;
 		default:
 			message = ":default message";
 			break ;
