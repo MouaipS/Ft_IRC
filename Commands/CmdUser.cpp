@@ -2,7 +2,7 @@
 #include "Utils.hpp"
 #include "Exception.hpp"
 
-CmdUser::CmdUser() : ICommand::ICommand() {};
+CmdUser::CmdUser(std::string time) : ICommand::ICommand(),  _timeOfDay(time) {};
 
 static bool isAvailable(std::string name, User *user, std::map<int, User*>& fdToUser) {
 
@@ -40,6 +40,11 @@ void CmdUser::execCmd(
     else if (isUserValidAuth(*user, 1, 1, 0)) {
 
         user->setUsername(correctUser);
+        user->setFd(fd_origin);
+        serverReply(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
+        serverReply(fd_origin, "002 " + correctUser + " :Your host is " + getServerName() + " running version InspIRCd v4", 0);
+        serverReply(fd_origin, "003 " + correctUser + " :This server was created " + _timeOfDay, 0);
+        serverReply(fd_origin, "004 " + correctUser + " :" + getServerName() + " InspIRCD v4 itkol", 0);
         serverReply(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
     }
     else { user->setUsername(correctUser); }

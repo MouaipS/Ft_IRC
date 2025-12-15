@@ -73,7 +73,7 @@ void Server::NewClient(int fd_actif, epoll_event dataEpoll, int epoll_fd) {
  */
 void	Server::initCommands() {
 
-	_commands.insert(std::make_pair("USER", new CmdUser()));
+	_commands.insert(std::make_pair("USER", new CmdUser(_timeOfDay)));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
 	_commands.insert(std::make_pair("TOPIC", new CmdTopic()));

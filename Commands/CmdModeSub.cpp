@@ -69,7 +69,7 @@ void CmdMode::ModeOp(Channel &channel, std::string target){
 	if(userTarget == NULL) {
 		throw ExceptionCode(ERR_USERNOTINCHANNEL);
 	}
-	if(channel.findOperator(*userTarget) != -1){// faire avec le nickname
+	if(channel.findOperator(*userTarget) != -1){
 		sendUsers(channel.getUsers(), &channel, " +o "+ userTarget->getUsername());
 		return;
 	}

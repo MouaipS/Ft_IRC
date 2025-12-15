@@ -4,7 +4,6 @@
 class CmdNick : public ICommand {
 
 	public:
-		CmdNick();
 		CmdNick(std::string);
 		void execCmd(
 				int fd_origin,

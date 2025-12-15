@@ -2,7 +2,6 @@
 #include "Exception.hpp"
 #include "Utils.hpp"
 
-CmdNick::CmdNick() : ICommand::ICommand() {};
 CmdNick::CmdNick(std::string time) : ICommand::ICommand(), _timeOfDay(time) {};
 
 static bool isAvailable(std::string CorrectNick, User *user, std::map<int, User*>& fdToUser) {
