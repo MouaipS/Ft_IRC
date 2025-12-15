@@ -169,7 +169,7 @@ void CmdJoin::execCmd(
 			Channel *channel = findChannel(allChannels, chanToJoin[j]);
 			channel->setNewUser(user);
 			channel->promoteUser(*user);
-			clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), ":oui", 0); //oui ?
+			clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), "oui", 0); //oui ?
 			serverReply(user->getFd(), "353 " + user->getUsername() + " = " + channel->getName() + " :" +  user->getNickname(), 0);
 			serverReply(user->getFd(), "366 " + user->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
 		}

@@ -41,7 +41,6 @@ std::string	reasonPart(std::vector<std::string> &cmd) {
 	cmd[2].erase(cmd[2].begin());
 	for (size_t i = 2; i < cmd.size(); i++)
 	{
-		std::cout << cmd[i] << std::endl;
 		reason += cmd[i];
 		if (i == cmd.size() - 1)
 			break ;
@@ -61,13 +60,14 @@ void CmdPart::execCmd(
 		throw ExceptionCode(ERR_NOTREGISTERED);
 	if (cmd.size() <= 1)
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
-	std::string reason = "No particular reason";
+	std::string reason = user->getNickname();
 	if(cmd.size() > 2 )
 	{
 		if (cmd[2][0] != ':')
 			throw ExceptionCode(ERR_INPUTTOOLONG);
 		reason = reasonPart(cmd);
 	}
+	std::cout << "reason: " << reason << std::endl;
 	
 	std::vector<std::string> channels = parseChannel(cmd[1]);
 	std::vector<std::string>::iterator it = channels.begin();
