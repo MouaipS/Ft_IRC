@@ -34,4 +34,5 @@ class User {
 		std::string _username;
 		std::string _nickname;
 		std::string _buffer;
+		int			_wallet;
 };

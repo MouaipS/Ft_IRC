@@ -22,6 +22,7 @@
 #include "Commands/CmdUser.hpp"
 #include "Commands/CmdSee.hpp"
 #include "Commands/CmdPart.hpp"
+#include "Commands/CmdBlackJack.hpp"
 
 #define CHANNEL_LIMIT	1000
 #define BUFFER_SIZE 512
@@ -79,6 +80,7 @@ class Server
 		std::vector<Channel*>				_allChannels;
 		std::map<int, User*>				_fdToUser;
 		std::map<std::string, ICommand*>	_commands;
+		bool								_isBJChannel;
 
 		std::string			_timeOfDay;
 		addrinfo			_hints;
@@ -97,4 +99,7 @@ class Server
 		bool 	isBufferReady(std::string& buffer);
 		void 	handleBufferTooLong(int fd, User *user, std::string& buffer);
 		void 	cleanChannel();
+		bool getBJ();
+		void setBJ(bool status);
+
 };

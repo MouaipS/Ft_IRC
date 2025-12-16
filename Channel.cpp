@@ -67,6 +67,14 @@ std::vector<User*>& Channel::getGuestList() {
 	return _guestlist;
 }
 
+bool Channel::getBJMode() const{
+	return(_BJMode);
+}
+
+bool Channel::getIsBJRun() const{
+	return(_BJActif);
+}
+
 
 // ------------- SET  ------------- //
 
@@ -295,6 +303,41 @@ void Channel::demoteUser(User &user)
 void	Channel::addGuest(User &user){
 	_guestlist.push_back(&user);
 }
+
+
+void Channel::startBJ(){
+	_BJActif = true;
+	_bjPlayers.clear();
+}
+
+bool Channel::isBJPlayer(User* user) const
+{
+    for (size_t i = 0; i < _bjPlayers.size(); ++i)
+    {
+        if (_bjPlayers[i].user == user)
+            return true;
+    }
+    return false;
+}
+
+void Channel::addBJPlayer(User* user)
+{
+    BJPlayer tmp;
+    tmp.user = user;
+    tmp.stayed = false;
+
+    tmp.hand.push_back(std::rand() % 13 + 1);
+    tmp.hand.push_back(std::rand() % 13 + 1);
+
+    _bjPlayers.push_back(tmp);
+}
+
+std::vector<BJPlayer>& Channel::getBJPlayers()
+{
+    return (_bjPlayers);
+}
+
+
 
 // Exceptions
 

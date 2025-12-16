@@ -106,6 +106,8 @@ void	Server::initCommands() {
 	_commands.insert(std::make_pair("PART", new CmdPart()));
 	if (!_commands.begin()->second)
 		throw InitCommandFail();
+	_commands.insert(std::make_pair("!BLACKJACK", new CmdBlackJack()));
+		throw InitCommandFail();
 }
 
 /**
@@ -153,6 +155,14 @@ User*	Server::getUser(int fd)
 		return (NULL);
 
 	return (it->second);
+}
+
+bool Server::getBJ(){
+	return(_isBJChannel);
+}
+
+void Server::setBJ(bool status){
+	_isBJChannel = status;
 }
 
 /**

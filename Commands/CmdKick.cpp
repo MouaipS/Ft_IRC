@@ -3,6 +3,16 @@
 #include "Exception.hpp"
 CmdKick::CmdKick() : ICommand::ICommand() {};
 
+std::vector<Channel*>::iterator	findChannel(std::vector<Channel*>& allChannels, std::string channel) {
+
+    std::vector<Channel*>::iterator it = allChannels.begin();
+
+    for (; it != allChannels.end(); it++) {
+        if((*it)->getName() == channel)
+      break ;
+  }
+  return it;
+}
 
 /**
  * @brief find the target/check the channel/find OP
@@ -13,18 +23,6 @@ CmdKick::CmdKick() : ICommand::ICommand() {};
  * - 3 : Can't find the channel
  * - 4 : Is op
  */
-
-std::vector<Channel*>::iterator	findChannel(std::vector<Channel*>& allChannels, std::string channel) {
-
-    std::vector<Channel*>::iterator it = allChannels.begin();
-
-    for (; it != allChannels.end(); it++) {
-        if((*it)->getName() == channel)
-			break ;
-	}
-	return it;
-}
-
 int findTarget(std::string target, std::vector<Channel*>::iterator &it, User *&userTarget) {
 
 	if ((*it)->getUsers().empty())
