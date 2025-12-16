@@ -144,6 +144,10 @@ void	Channel::deleteUser(User* user) {
 	}
 }
 
+void	Channel::setBJ(bool status){
+	_BJMode  = status;
+}
+
 // ------------- UTILS  ------------- //
 
 /**
@@ -310,6 +314,11 @@ void Channel::startBJ(){
 	_bjPlayers.clear();
 }
 
+void Channel::stopBJ(){
+	_BJActif = false;
+	_bjPlayers.clear();
+}
+
 bool Channel::isBJPlayer(User* user) const
 {
     for (size_t i = 0; i < _bjPlayers.size(); ++i)
@@ -332,7 +341,7 @@ void Channel::addBJPlayer(User* user)
     _bjPlayers.push_back(tmp);
 }
 
-std::vector<BJPlayer>& Channel::getBJPlayers()
+std::vector<Channel::BJPlayer>& Channel::getBJPlayers()
 {
     return (_bjPlayers);
 }

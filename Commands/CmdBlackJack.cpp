@@ -2,10 +2,9 @@
 #include "Exception.hpp"
 #include "Utils.hpp"
 
-std::vector<Channel*>::iterator	findChannel(std::vector<Channel*>& allChannels, std::string channel) {
+static std::vector<Channel*>::iterator	findChannel(std::vector<Channel*>& allChannels, std::string channel) {
 
     std::vector<Channel*>::iterator it = allChannels.begin();
-
     for (; it != allChannels.end(); it++) {
         if((*it)->getName() == channel)
 	break ;
@@ -13,22 +12,29 @@ std::vector<Channel*>::iterator	findChannel(std::vector<Channel*>& allChannels, 
 	return it;
 }
 
+std::string intToString(int value) {
+    std::stringstream ss;
+    ss << value; 
+    return ss.str();
+}
+
 CmdBlackJack::CmdBlackJack() {}
 
 
-void setup(Channel *channel) {
-	if(channel->getBJMode() == true)
+void setup(Channel& channel) {
+	if(channel.getBJMode() == true)
 		return;
-	channel->setBJ(true);
-	std::vector<User*>::iterator it = channel->getOperators();
-	for (; it != channel->getOperators.end(); ++it)
-		channel->demoteUser(it);
-	channel->setTopic("CHANNEL DU BLACKJACK");
-	channel->setIsInviteOnly(false);
-	channel->setIsKeyProtected(false);
-	channel->setIsTopicProtected(true);
-	channel->setIsLimit(true);
-	channel->setUserLimit(100);
+	channel.setBJ(true);
+	std::vector<User*> users = channel.getOperators();
+	std::vector<User*>::iterator it = users.begin();
+	for (; it != users.end(); it++)
+		channel.demoteUser(*(*it));
+	channel.setTopic("CHANNEL DU BLACKJACK");
+	channel.setIsInviteOnly(false);
+	channel.setIsKeyProtected(false);
+	channel.setIsTopicProtected(true);
+	channel.setIsLimit(true);
+	channel.setUserLimit(100);
 }
 
 void handleCmd(Channel *channel, User *user, std::string cmd){
@@ -37,24 +43,23 @@ void handleCmd(Channel *channel, User *user, std::string cmd){
     if (cmd == "START")
     {
         if(channel->getIsBJRun() == true){
-
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :Blackjack already running.")
+			noticeReply(user, "Blackjack already running.");
 			return;
 		}
 		channel->startBJ();
-		NoticeClient(TOUT LES FD, ":server NOTICE " + channel->getName() + " :Blackjack already running.")
+		noticeReply(channel, "Blackjack game is starting.");
 		return;
     }
     else if (cmd == "HIT")
 	{
-		if (!channel->isBJRunning())
+		if (!channel->getIsBJRun())
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :No blackjack game running.");
+			noticeReply(user, "No blackjack game running.");
 			return;
 		}
-		std::vector<BJPlayer>& players = channel->getBJPlayers();
-		BJPlayer* p = NULL;
-		for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+		std::vector<Channel::BJPlayer>::iterator it = channel->getBJPlayers().begin();
+		Channel::BJPlayer* p = NULL;
+		for (; it != channel->getBJPlayers().end(); ++it)
 		{
 			if (it->user == user)
 			{
@@ -64,29 +69,29 @@ void handleCmd(Channel *channel, User *user, std::string cmd){
 		}
 		if (!p)
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You are not in the game.");
+			noticeReply(user, "You are not in the game.");
 			return;
 		}
 		if (p->stayed)
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You already stayed.");
+			noticeReply(user, "You already stayed.");
 			return;
 		}
 		int card = std::rand() % 13 + 1;
 		p->hand.push_back(card);
-		NoticeClient(user->getFd(), "You drew: " + Utils::toString(card));
+		std::string message = "You drew: " + intToString(card);
+		noticeReply(user, message);
 	}
 	else if (cmd == "STAY")
 	{
-		if (!channel->isBJRunning())
+		if (!channel->getIsBJRun())
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :No blackjack game running.");
+			noticeReply(user, "No blackjack game running.");
 			return;
 		}
-		std::vector<BJPlayer>& players = channel->getBJPlayers();
-		BJPlayer* p = NULL;
-
-		for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+		std::vector<Channel::BJPlayer>::iterator it = channel->getBJPlayers().begin();
+		Channel::BJPlayer* p = NULL;
+		for (; it != channel->getBJPlayers().end(); ++it)
 		{
 			if (it->user == user)
 			{
@@ -96,22 +101,22 @@ void handleCmd(Channel *channel, User *user, std::string cmd){
 		}
 		if (!p)
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You are not in the game.");
+			noticeReply(user, "You are not in the game.");
 			return;
 		}
 		p->stayed = true;
-		NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You chose to STAY.");
+		noticeReply(user, "You chose to STAY.");
 	}
 	else if (cmd == "DOUBLE")
 	{
-		if (!channel->isBJRunning())
+		if (!channel->getIsBJRun())
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :No blackjack game running.");
+			noticeReply(user, "No blackjack game running.");
 			return;
 		}
-		std::vector<BJPlayer>& players = channel->getBJPlayers();
-		BJPlayer* p = NULL;
-		for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+		std::vector<Channel::BJPlayer>::iterator it = channel->getBJPlayers().begin();
+		Channel::BJPlayer* p = NULL;
+		for (; it != channel->getBJPlayers().end(); ++it)
 		{
 			if (it->user == user)
 			{
@@ -121,65 +126,67 @@ void handleCmd(Channel *channel, User *user, std::string cmd){
 		}
 		if (!p)
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You are not in the game.");
+			noticeReply(user, "You are not in the game.");
 			return;
 		}
 		if (p->hand.size() != 2)
 		{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You can only DOUBLE on your first 2 cards.");
+			noticeReply(user, "You can only DOUBLE on your first 2 cards.");
 			return;
 		}
-		p->bet *= 2; // si tu gères les mises
+		//p->bet *= 2; // gestion des mises
 		int card = rand() % 13 + 1;
 		p->hand.push_back(card);
 		p->stayed = true;
-		NoticeClient(user->getFd(), "You doubled and drew: " + Utils::toString(card));
+		std::string message = "You doubled and drew: " + intToString(card);
+		noticeReply(user, message);
 	}
 	else if (cmd == "IN")
 	{
-		if (!channel->isBJRunning())
+		if (!channel->getIsBJRun())
     	{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + "No blackjack game running.")
+			noticeReply(user, "No blackjack game running.");
         	return;
     	}
     	if (channel->isBJPlayer(user))
     	{
-			NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + "You are already in the game.")
+			noticeReply(user, "You are already in the game.");
         	return;
 		}
+		noticeReply(channel, user->getNickname() + " joined the blackjack game.");
 		channel->addBJPlayer(user);
-		NoticeClient(TOUT LES FD, ":server NOTICE " + channel->getName() + " :" + user->getNickname() + " joined the blackjack game.");
-		BJPlayer& p = channel->getBJPlayers().back();
-    	NoticeClient(user->getFd(),"Your cards: " +p.hand[0] + ", " +p.hand[1]);
+		Channel::BJPlayer& p = channel->getBJPlayers().back();
+		std::string message  = "Your cards : " + intToString(p.hand[0]) + " " + intToString(p.hand[1]);
+		noticeReply(user, message);
 	}
-	else if (cmd == "END")
+	else if (cmd == "OUT")
     {
       if (!channel->getIsBJRun())
         {
-            NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :No blackjack game running.");
+			noticeReply(user, "No blackjack game running.");
             return;
         }
-        std::vector<BJPlayer>& players = channel->getBJPlayers();
+		std::vector<Channel::BJPlayer>::iterator it = channel->getBJPlayers().begin();
         bool found = false;
-        for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+        for (; it != channel->getBJPlayers().end(); ++it)
         {
             if (it->user == user)
             {
-                players.erase(it);
+                channel->getBJPlayers().erase(it);
                 found = true;
                 break;
             }
         }
         if (!found)
         {
-            NoticeClient(user->getFd(), ":server NOTICE " + channel->getName() + " :You are not in the game.");
+			noticeReply(user, "You are not in the game.");
             return;
         }
-        NoticeClient(TOUT_LES_FD, ":server NOTICE " + channel->getName() + " :" + user->getNickname() + " has left the blackjack game.");
-        if (_bjPlayers.empty())
+		noticeReply(channel, user->getNickname() + " has left the blackjack game.");
+        if (channel->getBJPlayers().empty())
         {
             channel->stopBJ();
-            NoticeClient(TOUT_LES_FD, ":server NOTICE " + channel->getName() + " :The blackjack game has ended (no more players).");
+			noticeReply(channel, " :The blackjack game has ended (no more players).");
         }
         return;
 	}
@@ -196,19 +203,21 @@ void CmdBlackJack::execCmd(
     std::vector<Channel*>& allChannels,
     std::map<int, User*>& fdToUser)
 {
+	std::cout << "GFUIDHGJD" << cmd[0] << std::endl;
     User *user = fdToUser[fd_origin];
     if (!isUserValidAuth(*user, 1, 1, 1))
         throw ExceptionCode(ERR_NOTREGISTERED);
-    if (cmd.size() < 2)
+    if (cmd.size() < 1)
         throw ExceptionCode(ERR_NEEDMOREPARAMS);
-    std::vector<Channel*>::iterator it = findChannel(allChannels, cmd[1]);
+    std::vector<Channel*>::iterator it = findChannel(allChannels, cmd[0]);
     if (it == allChannels.end())
         throw ExceptionCode(ERR_NOSUCHCHANNEL);
     Channel *channel = *it;
-    if (cmd.size() == 2)
+    if (cmd.size() == 1)
     {
-        setup(channel);
+        setup(*channel);
         return;
     }
     handleCmd(channel, user, cmd[2]);
+	(void) password;
 }

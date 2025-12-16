@@ -58,48 +58,48 @@ public:
 
 
 
-bool allStayed = true;
-std::vector<BJPlayer>& players = channel->getBJPlayers();
-for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
-{
-    if (!it->stayed)
-    {
-        allStayed = false;
-        break;
-    }
-}
-if (allStayed)
-{
-    int bestScore = 0;
-    std::vector<BJPlayer*> winners;
-    for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
-    {
-        int score = calculateScore(it->hand);
-        if (score > 21) continue;
-        if (score > bestScore)
-        {
-            bestScore = score;
-            winners.clear();
-            winners.push_back(&(*it));
-        }
-        else if (score == bestScore)
-        {
-            winners.push_back(&(*it));
-        }
-    }
-    if (winners.empty())
-    {
-        NoticeClient(TOUT_LES_FD, ":server NOTICE " + channel->getName() + " :All players busted! No winners.");
-    }
-    else
-    {
-        std::string msg = ":server NOTICE " + channel->getName() + " :Winner(s): ";
-        for (std::vector<BJPlayer*>::iterator it = winners.begin(); it != winners.end(); ++it)
-        {
-            msg += (*it)->user->getNickname() + " ";
-        }
-        NoticeClient(TOUT_LES_FD, msg);
-    }
-    channel->stopBJ();
-}
+//bool allStayed = true;
+//std::vector<BJPlayer>& players = channel->getBJPlayers();
+//for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+//{
+//    if (!it->stayed)
+//    {
+//        allStayed = false;
+//        break;
+//    }
+//}
+//if (allStayed)
+//{
+//    int bestScore = 0;
+//    std::vector<BJPlayer*> winners;
+//    for (std::vector<BJPlayer>::iterator it = players.begin(); it != players.end(); ++it)
+//    {
+//        int score = calculateScore(it->hand);
+//        if (score > 21) continue;
+//        if (score > bestScore)
+//        {
+//            bestScore = score;
+//            winners.clear();
+//            winners.push_back(&(*it));
+//        }
+//        else if (score == bestScore)
+//        {
+//            winners.push_back(&(*it));
+//        }
+//    }
+//    if (winners.empty())
+//    {
+//        NoticeClient(TOUT_LES_FD, ":server NOTICE " + channel->getName() + " :All players busted! No winners.");
+//    }
+//    else
+//    {
+//        std::string msg = ":server NOTICE " + channel->getName() + " :Winner(s): ";
+//        for (std::vector<BJPlayer*>::iterator it = winners.begin(); it != winners.end(); ++it)
+//        {
+//            msg += (*it)->user->getNickname() + " ";
+//        }
+//        NoticeClient(TOUT_LES_FD, msg);
+//    }
+//    channel->stopBJ();
+//}
 

@@ -5,15 +5,15 @@
 class User;
 
 class Channel {
-	private :
-
+	
+	public :
 		struct BJPlayer
-	{
-    	User* user;
-    	std::vector<int> hand;
-    	bool stayed;
-	};
-
+		{
+			User* user;
+			std::vector<int> hand;
+			bool stayed;
+		};
+	private :
 		bool					_BJMode;
 		bool					_BJActif;
 	    std::vector<BJPlayer> 	_bjPlayers;
@@ -39,7 +39,7 @@ class Channel {
 		bool					getBJMode() const;
 		bool					getIsBJRun() const;
 		bool					isBJPlayer(User *user) const;
-		std::vector<BJPlayer>& 	getBJPlayers();
+		std::vector<Channel::BJPlayer>& 	getBJPlayers();
 
 		
 		
@@ -56,7 +56,7 @@ class Channel {
 		void	setNewOperator(User *user);
 		void	deleteUser(User* user);
 
-		void	setBJ();
+		void	setBJ(bool value);
 
 		// Utils
 
