@@ -54,7 +54,7 @@ ExceptionCode::ExceptionCode(ErrorCode id) throw(): code(id) {
 			message = ":Password incorrect";
 			break ;
 		case ERR_CHANOPRIVSNEEDED:
-			message = ":You're no channel operator";
+			message = ":You're not channel operator";
 			break ;
 		default:
 			message = ":default message";

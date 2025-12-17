@@ -83,7 +83,7 @@ void CmdPart::execCmd(
 		if (channel->findUser(*user) == -1) {
 			throw ExceptionCode(ERR_NOTONCHANNEL);
 		}
-		channel->removeUserFromChannel(*user);
 		sendUsers(channel->getUsers(), channel, user, reason);
+		channel->removeUserFromChannel(*user);
 	}
 }
