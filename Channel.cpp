@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(std::string name) : _name(name)
+Channel::Channel(std::string name) :  _BJMode(false), _name(name)
 {
 	_isInviteOnly = false;
 	_isTopicProtected = true;
@@ -344,6 +344,18 @@ void Channel::addBJPlayer(User* user)
 std::vector<Channel::BJPlayer>& Channel::getBJPlayers()
 {
     return (_bjPlayers);
+}
+
+void Channel::clearDealerHand()
+{
+    _dealerHand.clear();
+}
+void Channel::addDealerCard(int card){
+	_dealerHand.push_back(card);
+}
+
+std::vector<int>& Channel::getDealerHand(){
+	return(_dealerHand);
 }
 
 

@@ -12,11 +12,16 @@ class Channel {
 			User* user;
 			std::vector<int> hand;
 			bool stayed;
+			bool wait_end;
+			bool blackjack;
+			int bet;
 		};
 	private :
 		bool					_BJMode;
 		bool					_BJActif;
 	    std::vector<BJPlayer> 	_bjPlayers;
+		std::vector<int>		_dealerHand;
+
 
 	public :
 		Channel(std::string name);
@@ -73,6 +78,11 @@ class Channel {
 		void	startBJ();
 		void	stopBJ();
 		void	addBJPlayer(User *user);
+   		void	clearDealerHand();
+		void	addDealerCard(int card);
+		std::vector<int>& getDealerHand();
+
+
 	
 		class ChannelUserLimitExceededException: public std::exception {
 			public: const char* what() const throw();

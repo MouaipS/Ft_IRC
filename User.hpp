@@ -9,6 +9,7 @@ class User {
 	public :
 		User();
 		~User();
+		int			_wallet;
 
 		//Geter
 		int			getFd() const;
@@ -34,5 +35,4 @@ class User {
 		std::string _username;
 		std::string _nickname;
 		std::string _buffer;
-		int			_wallet;
 };

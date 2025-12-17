@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <string>
 
-User::User() : _isAuthed(false), _wallet(100){
+User::User() :  _wallet(100), _isAuthed(false){
 	(void)_wallet;
 }
 
