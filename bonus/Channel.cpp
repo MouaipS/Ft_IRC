@@ -1,0 +1,388 @@
+#include "Channel.hpp"
+#include "User.hpp"
+
+Channel::Channel(std::string name) : _BJMode(false), _BJActif(false), _name(name)
+{
+	_isInviteOnly = false;
+	_isTopicProtected = true;
+	_isKeyProtected = false;
+	_isUserLimit = true;
+	_userLimit = 100;
+}
+
+Channel::~Channel() {}
+
+// ------------- GET  ------------- //
+std::string Channel::getName() const
+{
+    return _name;
+}
+
+std::vector<User*> Channel::getUsers() const
+{
+    return _users;
+}
+
+std::vector<User*> Channel::getOperators() const
+{
+    return _operators;
+}
+
+std::string Channel::getTopic() const
+{
+    return _topic;
+}
+
+std::string Channel::getKey() const
+{
+    return _key;
+}
+
+bool Channel::getIsInviteOnly() const
+{
+    return _isInviteOnly;
+}
+
+bool Channel::getIsTopicProtected() const
+{
+    return _isTopicProtected;
+}
+
+bool Channel::getIsKeyProtected() const
+{
+    return _isKeyProtected;
+}
+
+bool Channel::getIsLimit() const
+{
+    return _isUserLimit;
+}
+
+size_t Channel::getUserLimit() const
+{
+    return _userLimit;
+}
+
+std::vector<User*>& Channel::getGuestList() {
+	return _guestlist;
+}
+
+bool Channel::getBJMode() const{
+	return(_BJMode);
+}
+
+bool Channel::getIsBJRun() const{
+	return(_BJActif);
+}
+
+
+// ------------- SET  ------------- //
+
+void Channel::setIsInviteOnly(bool value)
+{
+    _isInviteOnly = value;
+}
+
+void Channel::setTopic(const std::string& value)
+{
+    _topic = value;
+}
+
+void Channel::setIsTopicProtected(bool value)
+{
+    _isTopicProtected = value;
+}
+
+void Channel::setKey(const std::string& value)
+{
+    _key = value;
+}
+
+void Channel::setIsKeyProtected(bool value)
+{
+    _isKeyProtected = value;
+}
+
+void Channel::setUserLimit(size_t value)
+{
+    _userLimit = value;
+}
+
+void Channel::setIsLimit(bool value)
+{
+    _isUserLimit = value;
+}
+
+void	Channel::setNewUser(User* user) {
+
+	_users.push_back(user);
+}
+
+void	Channel::deleteUser(User* user) {
+
+	std::vector<User*>::iterator	it = _users.begin();
+	std::vector<User*>::iterator	itt = _operators.begin();
+	std::vector<User*>::iterator	ittt = _guestlist.begin();
+
+	for (; it != _users.end(); it++) {
+		if (user->getUsername() == (*it)->getUsername()){
+			for(; itt != _operators.end(); itt++){
+				if (user->getUsername() == (*itt)->getUsername()){
+					_operators.erase(itt);
+					break;
+				}
+			}
+			_users.erase(it);
+			break;
+		}
+	}
+	for(; ittt != _guestlist.end(); ittt++){
+		if (user->getUsername() == (*ittt)->getUsername()){
+			_guestlist.erase(ittt);
+			break;
+		}
+	}
+}
+
+void	Channel::setBJ(bool status){
+	_BJMode  = status;
+}
+
+// ------------- UTILS  ------------- //
+
+/**
+ * @brief Searches for a user in the channel's user list.
+ * 
+ * @param user Reference to the user to search for.
+ * @return int
+ * - The index (position) of the user in the `_users` vector if found.
+ * - Returns `-1` if the user is not present in the channel.
+ */
+int Channel::findUser(User& user)
+{
+	for (size_t i = 0; i < _users.size(); ++i)
+	{
+		if (&user == _users[i])
+			return (i);
+	}
+	return (-1);
+}
+
+/**
+ * @brief Searches for a user in the channel's user list.
+ * 
+ * @param name The username to the user to search for.
+ * @return User*
+ * - ptr on the user found
+ * - NULL if the user is not present in the channel
+ */
+User *Channel::findUser(std::string name) {
+	std::vector<User*>::iterator it = _users.begin();
+	for(;it != _users.end(); it++){
+		if((*it)->getUsername() == name)
+			return((*it));
+	}
+	return(NULL);
+}
+
+User *Channel::findNick(std::string name){
+	std::vector<User*>::iterator it = _users.begin();
+	for(;it != _users.end(); it++){
+		if((*it)->getNickname() == name)
+			return((*it));
+	}
+	return(NULL);
+}
+
+/**
+ * @brief Searches for a user in the channel's operator list.
+ * 
+ * @param user Reference to the user to search for.
+ * @return int
+ * - The index (position) of the user in the `_operators` vector if found.
+ * - Returns `-1` if the user is not an operator in the channel.
+ */
+int Channel::findOperator(User& user)
+{
+	for (size_t i = 0; i < _operators.size(); ++i)
+	{
+		if (&user == _operators[i])
+			return (i);
+	}
+	return (-1);
+}
+
+/**
+ * @brief Adds a user to the channel.
+ * 
+ * @param user Reference to the user to add.
+ * @throw ChannelUserLimitExceededException if the user limit has been reached.
+ * @throw UserAlreadyInChannelException if the user is already in the channel.
+ * 
+ * Adds the user to the `_users` list if the channel has not reached its limit
+ * and if the user is not already present.
+ */
+void Channel::addUserToChannel(User& user)
+{
+	if (_isUserLimit && _users.size() >= _userLimit)
+		throw (ChannelUserLimitExceededException());
+
+	if (findUser(user) >= 0)
+		throw (UserAlreadyInChannelException());
+
+	_users.push_back(&user);
+}
+
+/**
+ * @brief Removes a user from the channel (and from the operator list if applicable).
+ * 
+ * @param user Reference to the user to remove.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
+ * 
+ * Removes the user from the `_users` list, and also from `_operators`
+ * if they were an operator.
+ */
+void Channel::removeUserFromChannel(User& user)
+{
+	int user_index;
+	int operator_index;
+	
+	user_index = findUser(user);
+	operator_index = findOperator(user);
+	
+	if (operator_index >= 0){
+		
+		_operators.erase(_operators.begin() + operator_index);
+	}
+	if (user_index < 0)
+		throw (UserNotFoundInChannelException());
+
+	_users.erase(_users.begin() + user_index);
+}
+
+/**
+ * @brief Promotes a user to channel operator.
+ * 
+ * @param user Reference to the user to promote.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
+ * @throw UserAlreadyOperatorException if the user is already an operator.
+ * 
+ * Adds the user to the `_operators` list if they are part of the channel
+ * and not already an operator.
+ */
+void Channel::promoteUser(User &user)
+{
+	if (findUser(user) < 0)
+		throw (UserNotFoundInChannelException());
+
+	if (findOperator(user) >= 0)
+		throw (UserAlreadyOperatorException());
+
+	_operators.push_back(&user);
+}
+
+/**
+ * @brief Demotes an operator to a regular user.
+ * 
+ * @param user Reference to the user to demote.
+ * @throw UserNotFoundInChannelException if the user is not present in the channel.
+ * @throw UserNotOperatorException if the user is not an operator.
+ * 
+ * Removes the user from the `_operators` list if found.
+ */
+void Channel::demoteUser(User &user)
+{
+	int operator_index;
+
+	if (findUser(user) < 0)
+		throw (UserNotFoundInChannelException());
+
+	operator_index = findOperator(user);
+	if (operator_index < 0)
+		throw (UserNotOperatorException());
+
+	_operators.erase(_operators.begin() + operator_index);
+}
+
+void	Channel::addGuest(User &user){
+	_guestlist.push_back(&user);
+}
+
+
+void Channel::startBJ(){
+	_BJActif = true;
+	_bjPlayers.clear();
+}
+
+void Channel::stopBJ(){
+	_BJActif = false;
+	_bjPlayers.clear();
+}
+
+bool Channel::isBJPlayer(User* user) const
+{
+    for (size_t i = 0; i < _bjPlayers.size(); ++i)
+    {
+        if (_bjPlayers[i].user == user)
+            return true;
+    }
+    return false;
+}
+
+void Channel::addBJPlayer(User* user)
+{
+    BJPlayer tmp;
+    tmp.user = user;
+    tmp.stayed = false;
+
+    tmp.hand.push_back(std::rand() % 13 + 1);
+    tmp.hand.push_back(std::rand() % 13 + 1);
+
+    _bjPlayers.push_back(tmp);
+}
+
+std::vector<Channel::BJPlayer>& Channel::getBJPlayers()
+{
+    return (_bjPlayers);
+}
+
+void Channel::clearDealerHand()
+{
+    _dealerHand.clear();
+}
+void Channel::addDealerCard(int card){
+	_dealerHand.push_back(card);
+}
+
+std::vector<int>& Channel::getDealerHand(){
+	return(_dealerHand);
+}
+
+
+
+// Exceptions
+
+const char* Channel::ChannelUserLimitExceededException::what() const throw()
+{
+    return ("Channel user limit exceeded.");
+}
+
+const char* Channel::UserNotFoundInChannelException::what() const throw()
+{
+    return ("User not found in channel.");
+}
+
+const char* Channel::UserNotOperatorException::what() const throw()
+{
+    return ("User is not an operator.");
+}
+
+const char* Channel::UserAlreadyInChannelException::what() const throw()
+{
+    return ("User is already in the channel.");
+}
+
+const char* Channel::UserAlreadyOperatorException::what() const throw()
+{
+    return ("User is already an operator.");
+}
