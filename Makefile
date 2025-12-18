@@ -17,9 +17,8 @@ SOURCES = main.cpp \
           Commands/CmdPass.cpp \
           Commands/CmdPrivmsg.cpp \
           Commands/CmdUser.cpp \
-          Commands/CmdPart.cpp \
-          Commands/CmdSee.cpp 
-
+          Commands/CmdPart.cpp 
+          
 OBJ = $(SOURCES:.cpp=.o)
 OBJDIR = objects
 OBJECTS = $(addprefix $(OBJDIR)/, $(OBJ))
