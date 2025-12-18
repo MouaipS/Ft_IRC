@@ -53,7 +53,7 @@ void CmdInvite::execCmd(
             clientReply(target->getFd(), user->getNickname(), user->getUsername(), "INVITE" , target->getNickname() + " " + channel->getName(), "", 0);
             serverReply(user->getFd(), channel->getName() + " " + target->getNickname(), 0);
         } else{
-            throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
+            throw ExceptionCode(ERR_CHANOPRIVSNEEDED, "", channel->getName());
         }
         return;
     }

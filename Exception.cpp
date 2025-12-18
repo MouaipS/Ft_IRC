@@ -53,9 +53,6 @@ ExceptionCode::ExceptionCode(ErrorCode id) throw(): code(id) {
 		case ERR_PASSWDMISMATCH:
 			message = ":Password incorrect";
 			break ;
-		case ERR_CHANOPRIVSNEEDED:
-			message = ":You're not channel operator";
-			break ;
 		default:
 			message = ":default message";
 			break ;
@@ -78,6 +75,9 @@ ExceptionCode::ExceptionCode(ErrorCode id, std::string c, std::string channelNam
 		case ERR_BADCHANNELKEY:
 			message = channelName + " :Cannot join channel (+k)";
 			break;
+		case ERR_CHANOPRIVSNEEDED:
+			message = channelName+ " :You're not channel operator";
+			break ;
 		default:
 			message = ":default message";
 			break ;
