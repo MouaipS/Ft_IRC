@@ -37,7 +37,7 @@ static void	leaveAllChannels(std::vector<Channel*>& allChannels, User&	user) {
 				std::vector<User*>	users = allChannels[i]->getUsers();
 				std::vector<User *>::iterator it = users.begin();
 				for(; it != users.end(); it++) {
-					clientReply((*it)->getFd(), user.getNickname(), user.getUsername(), "PART", allChannels[i]->getName(), "No particular reason", 0);
+					clientReply((*it)->getFd(), user.getNickname(), user.getUsername(), "PART", allChannels[i]->getName(), " :No particular reason", 0);
 				}
 				allChannels[i]->removeUserFromChannel(user);
 				break ;
@@ -144,7 +144,7 @@ void CmdJoin::execCmd(
 					std::vector<User*>& guests = (*it)->getGuestList();
 					guests.erase(std::remove(guests.begin(), guests.end(), user),guests.end());
 					}
-					clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", cmd[1], ":oui", 0); //oui ?
+					clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", cmd[1], "", 0);
 					Channel *channel = findChannel(allChannels, chanToJoin[j]);
 					channel->setNewUser(user);
 					serverReply(fd_origin, "332 " + user->getUsername() + " " + chanToJoin[j] + " :" + channel->getTopic(), 0);
@@ -169,7 +169,7 @@ void CmdJoin::execCmd(
 			Channel *channel = findChannel(allChannels, chanToJoin[j]);
 			channel->setNewUser(user);
 			channel->promoteUser(*user);
-			clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), "oui", 0); //oui ?
+			clientReply(fd_origin, user->getNickname(), user->getUsername(), "JOIN", channel->getName(), "", 0);
 			serverReply(user->getFd(), "353 " + user->getUsername() + " = " + channel->getName() + " :" +  user->getNickname(), 0);
 			serverReply(user->getFd(), "366 " + user->getUsername() + " " + channel->getName() + " :End of NAMES list", 0);
 		}

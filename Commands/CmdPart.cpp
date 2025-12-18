@@ -30,7 +30,7 @@ void sendUsers(std::vector<User *> users, Channel *channel, User *user, std::str
 
 	std::vector<User *>::iterator it = users.begin();
 	for(; it != users.end(); it++) {
-		clientReply((*it)->getFd(), user->getNickname(), user->getUsername(), "PART", channel->getName(), reason, 0);
+		clientReply((*it)->getFd(), user->getNickname(), user->getUsername(), "PART", channel->getName(), " :" + reason, 0);
 	}
 }
 
