@@ -62,7 +62,7 @@ void CmdMode::execCmd(
     if (channel->findUser(*user) == -1) {
 		throw ExceptionCode(ERR_NOTONCHANNEL);
     } else if (channel->findOperator(*user) == -1) {
-		throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
+            throw ExceptionCode(ERR_CHANOPRIVSNEEDED, "", channel->getName());
     }
     std::vector<std::string> flags = parseFlags(cmd[2]);
     std::vector<std::string>::iterator it = flags.begin();

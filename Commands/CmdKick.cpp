@@ -28,7 +28,7 @@ int findTarget(std::string target, std::vector<Channel*>::iterator &it, User *&u
 	if ((*it)->getUsers().empty())
 		return(0);
 
-	userTarget = (*it)->findUser(target);
+	userTarget = (*it)->findNick(target);
 	if (userTarget == NULL)
 		return(2);
 	if ((*it)->findOperator(*userTarget) != -1)
@@ -42,7 +42,7 @@ void	sendToUsers(std::vector<Channel*>::iterator &it, User* user, std::string wh
 
 	for (size_t i = 0; i < allUsers.size(); i++) {
 
-        clientReply(allUsers[i]->getFd(), user->getNickname(), user->getUsername(), "KICK " + (*it)->getName(), who, reason, 0);
+        clientReply(allUsers[i]->getFd(), user->getNickname(), user->getUsername(), "KICK " + (*it)->getName(), who, " :" + reason, 0);
 	}
 }
 
@@ -81,11 +81,11 @@ void CmdKick::execCmd(
     else {
 
         User *userTmp;
-        int checkOp = findTarget(user->getUsername(), it, userTmp);
+        int checkOp = findTarget(user->getNickname(), it, userTmp);
         if(checkOp == 2)
 			throw ExceptionCode(ERR_NOTONCHANNEL);
         else if(checkOp != 4)
-			throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
+            throw ExceptionCode(ERR_CHANOPRIVSNEEDED, "", (*it)->getName());
         else
 		{
 			sendToUsers(it, user, cmd[2], reason);

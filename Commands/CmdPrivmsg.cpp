@@ -50,7 +50,7 @@ void CmdPrivmsg::execCmd(
 				for (size_t j = 0; j < myUser.size(); j++)
 				{
 					if (fd_origin != myUser[j]->getFd())
-						clientReply(myUser[j]->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
+						clientReply(myUser[j]->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], " :" + message, 0);
 				}
 				return ;
 			}
@@ -67,7 +67,7 @@ void CmdPrivmsg::execCmd(
 		if (it->second->getNickname() == cmd[1])
 		{
 			// send the message to the user
-			clientReply(it->second->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], message, 0);
+			clientReply(it->second->getFd(), user->getNickname(), user->getUsername(), "PRIVMSG", cmd[1], " :" + message, 0);
 			return ;
 		}
 	}

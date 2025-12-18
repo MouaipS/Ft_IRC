@@ -25,7 +25,7 @@ void CmdTopic::execCmd(
 			if(allChannels[i]->findUser(*user) == -1)
 				throw ExceptionCode(ERR_NOTONCHANNEL);
 			if (allChannels[i]->findOperator(*user) == -1 && cmd.size() > 2 && allChannels[i]->getIsTopicProtected() == true)
-				throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
+            throw ExceptionCode(ERR_CHANOPRIVSNEEDED, "", allChannels[i]->getName());
 
 			if (cmd.size() == 2) {
 				if(allChannels[i]->getTopic().empty())
@@ -41,11 +41,15 @@ void CmdTopic::execCmd(
 					allChannels[i]->setTopic("");
 					std::vector<User*>	myUser = allChannels[i]->getUsers();
 					for (size_t i = 0; i < myUser.size(); i++)
+					{
+						std::cout << "c'est moi" << std::endl;
 						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", allChannels[i]->getName(), "", 0);
+					}
 					return ;
 				}
 				else if (cmd[2][0] == ':')
 				{
+					allChannels[i]->setTopic("");
 					cmd[2].erase(cmd[2].begin());
 					std::string	message;
 					for (size_t i = 2; i < cmd.size(); i++) {
@@ -59,7 +63,7 @@ void CmdTopic::execCmd(
 
 					std::vector<User*>	myUser = allChannels[i]->getUsers();
 					for (size_t i = 0; i < myUser.size(); i++)
-						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", cmd[1], message, 0);
+						clientReply(myUser[i]->getFd(), user->getNickname(), user->getUsername(), "TOPIC", cmd[1], " :" + message, 0);
 					return ;
 				}
 			}
