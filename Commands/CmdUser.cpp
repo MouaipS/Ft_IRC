@@ -37,6 +37,6 @@ void CmdUser::execCmd(
 		  throw ExceptionCode(ERR_NEEDMOREPARAMS);
     else if (user->getIsAuthed() == false)
 		  throw ExceptionCode(ERR_PASSWDMISMATCH);
-    else {user->setUsername(correctUser);} //ptet send message
+    else {user->setUsername(correctUser);}
 }
 
