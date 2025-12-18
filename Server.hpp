@@ -20,7 +20,6 @@
 #include "Commands/CmdPass.hpp"
 #include "Commands/CmdPrivmsg.hpp"
 #include "Commands/CmdUser.hpp"
-#include "Commands/CmdSee.hpp"
 #include "Commands/CmdPart.hpp"
 #include "Commands/CmdBlackJack.hpp"
 

@@ -31,8 +31,12 @@ void CmdNick::execCmd(
 		throw ExceptionCode(ERR_NICKNAMEINUSE);
     else if (user->getIsAuthed() == false)
 		throw ExceptionCode(ERR_PASSWDMISMATCH);
-    else if(isUserValidAuth(*user, 1, 1, 1))
+    else if(isUserValidAuth(*user, 1, 1, 1)){
+        clientReply(user->getFd(), user->getNickname(), user->getUsername(), cmd[0], cmd[1], "", 0);
         user->setNickname(cmd[1]);
+    }
+    else if(!isUserValidAuth(*user, 1, 0, 1))
+        throw ExceptionCode(ERR_NOTREGISTERED);
     else if (isUserValidAuth(*user, 1, 0, 1)) {
         user->setNickname(cmd[1]);
 		user->setFd(fd_origin);
@@ -41,7 +45,6 @@ void CmdNick::execCmd(
         serverReply(fd_origin, "003 " + CorrectNick + " :This server was created " + _timeOfDay, 0);
         serverReply(fd_origin, "004 " + CorrectNick + " :" + getServerName() + " InspIRCD v4 itkol", 0);
     }
-    else {user->setNickname(cmd[1]);}
 }
 
 

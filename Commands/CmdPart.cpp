@@ -60,15 +60,13 @@ void CmdPart::execCmd(
 		throw ExceptionCode(ERR_NOTREGISTERED);
 	if (cmd.size() <= 1)
 		throw ExceptionCode(ERR_NEEDMOREPARAMS);
-	std::string reason = user->getNickname();
+	std::string reason = "Leaving";
 	if(cmd.size() > 2 )
 	{
 		if (cmd[2][0] != ':')
 			throw ExceptionCode(ERR_INPUTTOOLONG);
 		reason = reasonPart(cmd);
-	}
-	std::cout << "reason: " << reason << std::endl;
-	
+	}	
 	std::vector<std::string> channels = parseChannel(cmd[1]);
 	std::vector<std::string>::iterator it = channels.begin();
 

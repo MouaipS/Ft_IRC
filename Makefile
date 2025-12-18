@@ -11,16 +11,14 @@ SOURCES = main.cpp \
           Commands/CmdInvite.cpp \
           Commands/CmdTopic.cpp \
           Commands/CmdMode.cpp \
-          Commands/CmdModeSub.cpp \
           Commands/CmdJoin.cpp \
           Commands/CmdNick.cpp \
           Commands/CmdPass.cpp \
           Commands/CmdPrivmsg.cpp \
           Commands/CmdUser.cpp \
           Commands/CmdPart.cpp \
-          Commands/CmdSee.cpp \
           Commands/CmdBlackJack.cpp
-
+		  
 OBJ = $(SOURCES:.cpp=.o)
 OBJDIR = objects
 OBJECTS = $(addprefix $(OBJDIR)/, $(OBJ))
