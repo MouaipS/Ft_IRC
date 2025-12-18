@@ -15,7 +15,7 @@ void	clientReply(int fd, std::string nick, std::string user, std::string command
 {
 	std::string theBuffer;
 
-	theBuffer = ":" + nick + "!" + user + "@" + getServerName() + " " + command + " " + target + " :" + message + "\r\n";
+	theBuffer = ":" + nick + "!" + user + "@" + getServerName() + " " + command + " " + target + message + "\r\n";
 	send(fd, theBuffer.c_str(), theBuffer.length(), flag);
 	usleep(10);
 }
