@@ -31,21 +31,12 @@ void CmdUser::execCmd(
 		throw ExceptionCode(ERR_NONICKNAMEGIVEN);
 
     std::string correctUser = cmd[1];
-    if (isUserValidAuth(*user, 1, 1, 1))
-		throw ExceptionCode(ERR_ALREADYREGISTRED);
+    if (isUserValidAuth(*user, 1, 1, 1) || isUserValidAuth(*user, 1, 0, 1))
+		  throw ExceptionCode(ERR_ALREADYREGISTRED);
     else if (isAvailable(correctUser, user, fdToUser) == false)
-		throw ExceptionCode(ERR_NEEDMOREPARAMS);
+		  throw ExceptionCode(ERR_NEEDMOREPARAMS);
     else if (user->getIsAuthed() == false)
-		throw ExceptionCode(ERR_PASSWDMISMATCH);
-    else if (isUserValidAuth(*user, 1, 1, 0)) {
-
-        user->setUsername(correctUser);
-        user->setFd(fd_origin);
-        serverReply(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
-        serverReply(fd_origin, "002 " + correctUser + " :Your host is " + getServerName() + " running version InspIRCd v4", 0);
-        serverReply(fd_origin, "003 " + correctUser + " :This server was created " + _timeOfDay, 0);
-        serverReply(fd_origin, "004 " + correctUser + " :" + getServerName() + " InspIRCD v4 itkol", 0);
-        serverReply(fd_origin, "001 " + correctUser + " :Welcome to the IRC Network", 0);
-    }
-    else { user->setUsername(correctUser); }
+		  throw ExceptionCode(ERR_PASSWDMISMATCH);
+    else {user->setUsername(correctUser);} //ptet send message
 }
+
