@@ -44,7 +44,7 @@ void	sendToUsers(std::vector<Channel*>::iterator &it, User* user, std::string wh
 
 	for (size_t i = 0; i < allUsers.size(); i++) {
 
-        clientReply(allUsers[i]->getFd(), user->getNickname(), user->getUsername(), "KICK " + (*it)->getName(), who, reason, 0);
+        clientReply(allUsers[i]->getFd(), user->getNickname(), user->getUsername(), "KICK " + (*it)->getName(), who, " :" + reason, 0);
 	}
 }
 
