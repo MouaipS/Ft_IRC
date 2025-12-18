@@ -1,7 +1,7 @@
 #include "Channel.hpp"
 #include "User.hpp"
 
-Channel::Channel(std::string name) :  _BJMode(false), _name(name)
+Channel::Channel(std::string name) : _BJMode(false), _BJActif(false), _name(name)
 {
 	_isInviteOnly = false;
 	_isTopicProtected = true;
