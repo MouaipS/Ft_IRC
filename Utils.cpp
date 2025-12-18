@@ -26,7 +26,7 @@ void	noticeReply(Channel *channel, std::string message){
 	std::vector<User*> users = channel->getUsers();
 	std::vector<User*>::iterator it = users.begin();
 	for(; it !=users.end(); it++){
-		theBuffer = ":" + getServerName() + " NOTICE " + (*it)->getNickname() + " :" + message + "\r\n";
+		theBuffer = ":" + getServerName() + " NOTICE #BLACKJACK " + (*it)->getNickname() + " :" + message + "\r\n";
 		send((*it)->getFd(), theBuffer.c_str(), theBuffer.length(), 0);
 	}
 }
@@ -34,7 +34,7 @@ void	noticeReply(Channel *channel, std::string message){
 void	noticeReply(User *user, std::string message){
 	std::string theBuffer;
 
-	theBuffer = ":" + getServerName() + " NOTICE " + user->getNickname() + " :" + message + "\r\n";
+	theBuffer = ":" + getServerName() + " NOTICE #BLACKJACK " + user->getNickname() + " :" + message + "\r\n";
 	send(user->getFd(), theBuffer.c_str(), theBuffer.length(), 0);
 }
 
