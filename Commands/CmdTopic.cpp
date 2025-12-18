@@ -24,7 +24,7 @@ void CmdTopic::execCmd(
 		if (cmd[1] == allChannels[i]->getName()) {
 			if(allChannels[i]->findUser(*user) == -1)
 				throw ExceptionCode(ERR_NOTONCHANNEL);
-			if (allChannels[i]->findOperator(*user) == -1)
+			if (allChannels[i]->findOperator(*user) == -1 && cmd.size() > 2 && allChannels[i]->getIsTopicProtected() == true)
 				throw ExceptionCode(ERR_CHANOPRIVSNEEDED);
 
 			if (cmd.size() == 2) {
